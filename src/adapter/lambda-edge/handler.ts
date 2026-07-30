@@ -105,10 +105,7 @@ interface CloudFrontResult {
 const convertHeaders = (headers: Headers): CloudFrontHeaders => {
   const cfHeaders: CloudFrontHeaders = {}
   headers.forEach((value, key) => {
-    cfHeaders[key.toLowerCase()] = [
-      ...(cfHeaders[key.toLowerCase()] || []),
-      { key: key.toLowerCase(), value },
-    ]
+      throw new Error("STUB");
   })
   return cfHeaders
 }
@@ -122,27 +119,7 @@ export const handle = (
   callback?: Callback
 ) => Promise<CloudFrontResult | CloudFrontRequest>) => {
   return async (event, ...args: [context?: CloudFrontContext, callback?: Callback]) => {
-    const [context, callback] = args
-    let callbackError: Error | null = null
-    let callbackResult: CloudFrontResult | CloudFrontRequest | undefined
-    const res = await app.fetch(createRequest(event), {
-      event,
-      context,
-      callback: (err: Error | null, result?: CloudFrontResult | CloudFrontRequest) => {
-        if (!callbackError && !callbackResult) {
-          callbackError = err
-          callbackResult = result
-        }
-        callback?.(err, result)
-      },
-      config: event.Records[0].cf.config,
-      request: event.Records[0].cf.request,
-      response: event.Records[0].cf.response,
-    })
-    if (callbackError) {
-      throw callbackError
-    }
-    return callbackResult ?? createResult(res)
+      throw new Error("STUB");
   }
 }
 
@@ -171,7 +148,7 @@ const createRequest = (event: CloudFrontEdgeEvent): Request => {
 
   const headers = new Headers()
   Object.entries(event.Records[0].cf.request.headers).forEach(([k, v]) => {
-    v.forEach((header) => headers.append(k, header.value))
+      throw new Error("STUB");
   })
 
   const requestBody = event.Records[0].cf.request.body

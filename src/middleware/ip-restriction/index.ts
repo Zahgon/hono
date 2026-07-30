@@ -81,7 +81,7 @@ const buildMatcher = (
 
   for (let rule of rules) {
     if (rule === '*') {
-      return () => true
+      return () => { throw new Error("STUB"); }
     } else if (typeof rule === 'function') {
       functionRules.push(rule)
     } else {
@@ -125,44 +125,7 @@ const buildMatcher = (
     isIPv4: boolean
     binaryAddr?: bigint
   }): boolean => {
-    if (staticRules.has(remote.addr)) {
-      return true
-    }
-    const remoteAddr = (remote.binaryAddr ||= (
-      remote.isIPv4 ? convertIPv4ToBinary : convertIPv6ToBinary
-    )(remote.addr))
-    const remoteIPv4Addr =
-      remote.isIPv4 || isIPv4MappedIPv6(remoteAddr)
-        ? remote.isIPv4
-          ? remoteAddr
-          : convertIPv4MappedIPv6ToIPv4(remoteAddr)
-        : undefined
-    if ((remote.isIPv4 ? staticIPv4Rules : staticIPv6Rules).has(remoteAddr)) {
-      return true
-    }
-    for (const [isIPv4, addr, mask] of cidrRules) {
-      if (isIPv4) {
-        if (remoteIPv4Addr === undefined) {
-          continue
-        }
-        if ((remoteIPv4Addr & mask) === addr) {
-          return true
-        }
-        continue
-      }
-      if (remote.isIPv4) {
-        continue
-      }
-      if ((remoteAddr & mask) === addr) {
-        return true
-      }
-    }
-    for (const rule of functionRules) {
-      if (rule({ addr: remote.addr, type: remote.type })) {
-        return true
-      }
-    }
-    return false
+      throw new Error("STUB");
   }
 }
 
@@ -223,57 +186,5 @@ export const ipRestriction = (
     c: Context
   ) => Response | Promise<Response>
 ): MiddlewareHandler => {
-  const allowLength = allowList.length
-
-  const denyMatcher = buildMatcher(denyList)
-  const allowMatcher = buildMatcher(allowList)
-
-  const blockError = (c: Context): HTTPException =>
-    new HTTPException(403, {
-      res: c.text('Forbidden', {
-        status: 403,
-      }),
-    })
-
-  return async function ipRestriction(c, next) {
-    const connInfo = getIP(c)
-    const addr = typeof connInfo === 'string' ? connInfo : connInfo.remote.address
-    if (!addr) {
-      throw blockError(c)
-    }
-    const type =
-      (typeof connInfo !== 'string' && connInfo.remote.addressType) || distinctRemoteAddr(addr)
-
-    const remoteData = { addr, type, isIPv4: type === 'IPv4' }
-
-    try {
-      if (denyMatcher(remoteData)) {
-        if (onError) {
-          return onError({ addr, type }, c)
-        }
-        throw blockError(c)
-      }
-      if (allowMatcher(remoteData)) {
-        return await next()
-      }
-    } catch (e) {
-      if (
-        e instanceof TypeError &&
-        (e as InvalidIPAddressError).code === INVALID_IP_ADDRESS_ERROR_CODE
-      ) {
-        // If an invalid IP address is specified, treat it as if no IP address was specified
-        throw blockError(c)
-      }
-      throw e
-    }
-
-    if (allowLength === 0) {
-      return await next()
-    } else {
-      if (onError) {
-        return await onError({ addr, type }, c)
-      }
-      throw blockError(c)
-    }
-  }
+    throw new Error("STUB");
 }

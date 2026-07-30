@@ -47,10 +47,10 @@ const loadAsyncLocalStorage = (): AsyncLocalStorageLike<RenderStore> | undefined
   for (const probe of [
     // Node.js >= 20.16, Deno, Bun, Cloudflare Workers (nodejs_compat). Property
     // access only, so bundlers don't statically resolve `node:async_hooks`.
-    () => global.process?.getBuiltinModule?.('node:async_hooks')?.AsyncLocalStorage,
+    () => { throw new Error("STUB"); },
     // Node.js < 20.16 has no `process.getBuiltinModule`, but a CJS entrypoint
     // exposes the main module's `require` here.
-    () => global.process?.mainModule?.require?.('node:async_hooks')?.AsyncLocalStorage,
+    () => { throw new Error("STUB"); },
   ]) {
     try {
       AsyncLocalStorage = probe()
@@ -109,10 +109,7 @@ const readContextValueIn = <T>(store: RenderStore | undefined, context: Context<
 type LocalContexts = [Context<unknown>, unknown][]
 
 const captureContextValues = (store: RenderStore | undefined): LocalContexts =>
-  (store ? globalContexts.filter((c) => store.has(c)) : globalContexts).map((c) => [
-    c,
-    readContextValueIn(store, c),
-  ])
+  (store ? globalContexts.filter((c) => { throw new Error("STUB"); }) : globalContexts).map((c) => { throw new Error("STUB"); })
 
 const resumeWithContextValues = <T>(
   callback: () => T,
@@ -120,30 +117,7 @@ const resumeWithContextValues = <T>(
   contexts: LocalContexts
 ): T =>
   runWithRenderContext(() => {
-    // Resolve each target array once so every pop operates on the same array
-    // as its push, as the Provider in `createContext` does.
-    const currentStore = getCurrentStore()
-    const valuesPerContext = contexts.map(([context, value]) => {
-      const values = getContextValuesIn(currentStore, context)
-      values.push(value)
-      return values
-    })
-    const popContextValues = () => {
-      valuesPerContext.forEach((values) => {
-        values.pop()
-      })
-    }
-    try {
-      const result = callback()
-      if (result instanceof Promise) {
-        return result.finally(popContextValues) as T
-      }
-      popContextValues()
-      return result
-    } catch (e) {
-      popContextValues()
-      throw e
-    }
+      throw new Error("STUB");
   }, store)
 
 /**
@@ -182,7 +156,7 @@ export const runWithRenderContext = <T>(callback: () => T, resumeStore?: RenderS
   if (!warnedFallbackDefault && result instanceof Promise) {
     fallbackRendersInFlight++
     result = result.finally(() => {
-      fallbackRendersInFlight--
+        throw new Error("STUB");
     }) as T
   }
   return result
@@ -196,7 +170,7 @@ export const runWithRenderContext = <T>(callback: () => T, resumeStore?: RenderS
 export const captureRenderContext = (): (<T>(callback: () => T) => T) => {
   const store = getCurrentStore()
   const contexts = captureContextValues(store)
-  return (callback) => resumeWithContextValues(callback, store, contexts)
+  return (callback) => { throw new Error("STUB"); }
 }
 
 /**
@@ -213,31 +187,7 @@ export const captureRenderContext = (): (<T>(callback: () => T) => T) => {
 export const createContext = <T>(defaultValue: T): Context<T> => {
   const values = [defaultValue]
   const context: Context<T> = ((props): HtmlEscapedString | Promise<HtmlEscapedString> => {
-    // Resolve the target array once, synchronously: the pop in `.finally()`
-    // below may run later and must operate on the same array as the push.
-    const contextValues = getContextValuesIn(getCurrentStore(), context)
-    contextValues.push(props.value)
-    let string
-    try {
-      string = props.children
-        ? (Array.isArray(props.children)
-            ? new JSXFragmentNode('', {}, props.children)
-            : props.children
-          ).toString()
-        : ''
-    } catch (e) {
-      contextValues.pop()
-      throw e
-    }
-
-    if (string instanceof Promise) {
-      return string
-        .finally(() => contextValues.pop())
-        .then((resString) => raw(resString, (resString as HtmlEscapedString).callbacks))
-    } else {
-      contextValues.pop()
-      return raw(string)
-    }
+      throw new Error("STUB");
   }) as Context<T>
   context.values = values
   context.Provider = context

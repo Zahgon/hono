@@ -189,10 +189,10 @@ const applyProps = (
       } else if (key === 'ref') {
         let cleanup
         if (typeof value === 'function') {
-          cleanup = value(container) || (() => value(null))
+          cleanup = value(container) || (() => { throw new Error("STUB"); })
         } else if (value && 'current' in value) {
           value.current = container
-          cleanup = () => (value.current = null)
+          cleanup = () => { throw new Error("STUB"); }
         }
         refCleanupMap.set(container, cleanup)
       } else if (key === 'style') {
@@ -303,31 +303,10 @@ const getNextChildren = (
     delete (node as any).vR
   }
   if (typeof node.tag === 'function') {
-    node[DOM_STASH][1][STASH_EFFECT]?.forEach((data: EffectData) => callbacks.push(data))
+    node[DOM_STASH][1][STASH_EFFECT]?.forEach((data: EffectData) => { throw new Error("STUB"); })
   }
   node.vC.forEach((child) => {
-    if (isNodeString(child)) {
-      nextChildren.push(child)
-    } else {
-      if (typeof child.tag === 'function' || child.tag === '') {
-        child.c = container
-        const currentNextChildrenIndex = nextChildren.length
-        getNextChildren(child, container, nextChildren, childrenToRemove, callbacks)
-        if (child.s) {
-          for (let i = currentNextChildrenIndex; i < nextChildren.length; i++) {
-            nextChildren[i].s = true
-          }
-          child.s = false
-        }
-      } else {
-        nextChildren.push(child)
-        if (child.vR?.length) {
-          childrenToRemove.push(...child.vR)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          delete (child as any).vR
-        }
-      }
-    }
+      throw new Error("STUB");
   })
 }
 
@@ -339,26 +318,7 @@ const findInsertBefore = (node: Node | undefined): SupportedElement | Text | und
 }
 
 const removeNode = (node: Node): void => {
-  if (!isNodeString(node)) {
-    node[DOM_STASH]?.[1][STASH_EFFECT]?.forEach((data: EffectData) => data[2]?.())
-
-    refCleanupMap.get(node.e as Element)?.()
-    if (node.p === 2) {
-      node.vC?.forEach((n) => (n.p = 2))
-    }
-    node.vC?.forEach(removeNode)
-  }
-  if (!node.p) {
-    node.e?.remove()
-    delete node.e
-  }
-  if (typeof node.tag === 'function') {
-    updateMap.delete(node)
-    fallbackUpdateFnArrayMap.delete(node)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (node as any)[DOM_STASH][3] // delete explicitly for avoid circular reference
-    node.a = true
-  }
+    throw new Error("STUB");
 }
 
 const apply = (node: NodeObject, container: Container, isNew: boolean): void => {
@@ -405,7 +365,7 @@ const applyNodeObject = (node: NodeObject, container: Container, isNew: boolean)
       offset = offsetByNextNode
     } else {
       offset =
-        findChildNodeIndex(childNodes, next.find((n) => n.tag !== HONO_PORTAL_ELEMENT && n.e)?.e) ??
+        findChildNodeIndex(childNodes, next.find((n) => { throw new Error("STUB"); })?.e) ??
         -1
     }
 
@@ -463,18 +423,12 @@ const applyNodeObject = (node: NodeObject, container: Container, isNew: boolean)
     const useLayoutEffectCbs: Array<() => void> = []
     const useEffectCbs: Array<() => void> = []
     callbacks.forEach(([, useLayoutEffectCb, , useEffectCb, useInsertionEffectCb]) => {
-      if (useLayoutEffectCb) {
-        useLayoutEffectCbs.push(useLayoutEffectCb)
-      }
-      if (useEffectCb) {
-        useEffectCbs.push(useEffectCb)
-      }
-      useInsertionEffectCb?.() // invoke useInsertionEffect callbacks
+        throw new Error("STUB");
     })
-    useLayoutEffectCbs.forEach((cb) => cb()) // invoke useLayoutEffect callbacks
+    useLayoutEffectCbs.forEach((cb) => { throw new Error("STUB"); }) // invoke useLayoutEffect callbacks
     if (useEffectCbs.length) {
       requestAnimationFrame(() => {
-        useEffectCbs.forEach((cb) => cb()) // invoke useEffect callbacks
+          throw new Error("STUB");
       })
     }
   }
@@ -487,7 +441,7 @@ const isSameContext = (
   !!(
     oldContexts &&
     oldContexts.length === newContexts.length &&
-    oldContexts.every((ctx, i) => ctx[1] === newContexts[i][1])
+    oldContexts.every((ctx, i) => { throw new Error("STUB"); })
   )
 
 const fallbackUpdateFnArrayMap: WeakMap<
@@ -531,7 +485,7 @@ export const build = (context: Context, node: NodeObject, children?: Child[]): v
           !(child.tag as any)[DOM_INTERNAL_TAG]
         ) {
           if (globalJSXContexts.length > 0) {
-            child[DOM_STASH][2] = globalJSXContexts.map((c) => [c, c.values.at(-1)])
+            child[DOM_STASH][2] = globalJSXContexts.map((c) => { throw new Error("STUB"); })
           }
           if (context[5]?.length) {
             child[DOM_STASH][3] = context[5].at(-1) as [Context, ErrorHandler, NodeObject]
@@ -542,10 +496,10 @@ export const build = (context: Context, node: NodeObject, children?: Child[]): v
         if (oldVChildren && oldVChildren.length) {
           const i = oldVChildren.findIndex(
             isNodeString(child)
-              ? (c) => isNodeString(c)
+              ? (c) => { throw new Error("STUB"); }
               : child.key !== undefined
-                ? (c) => c.key === (child as Node).key && c.tag === (child as Node).tag
-                : (c) => c.tag === (child as Node).tag
+                ? (c) => { throw new Error("STUB"); }
+                : (c) => { throw new Error("STUB"); }
           )
 
           if (i !== -1) {
@@ -628,14 +582,7 @@ export const build = (context: Context, node: NodeObject, children?: Child[]): v
       fallbackUpdateFnArray.push(fallbackUpdateFn)
       fallbackUpdateFnArrayMap.set(errorHandlerNode as NodeObject, fallbackUpdateFnArray)
       const fallback = errorHandler(e, () => {
-        const fnArray = fallbackUpdateFnArrayMap.get(errorHandlerNode as NodeObject)
-        if (fnArray) {
-          const i = fnArray.indexOf(fallbackUpdateFn)
-          if (i !== -1) {
-            fnArray.splice(i, 1)
-            return fallbackUpdateFn()
-          }
-        }
+          throw new Error("STUB");
       })
       if (fallback) {
         if (context[0] === 1) {
@@ -706,13 +653,13 @@ export const buildNode = (node: Child): Node | undefined => {
 const replaceContainer = (node: NodeObject, from: DocumentFragment, to: Container): void => {
   if (node.c === from) {
     node.c = to
-    node.vC.forEach((child) => replaceContainer(child as NodeObject, from, to))
+    node.vC.forEach((child) => { throw new Error("STUB"); })
   }
 }
 
 const updateSync = (context: Context, node: NodeObject): void => {
   node[DOM_STASH][2]?.forEach(([c, v]) => {
-    c.values.push(v)
+      throw new Error("STUB");
   })
   try {
     build(context, node, undefined)
@@ -724,7 +671,7 @@ const updateSync = (context: Context, node: NodeObject): void => {
     return
   }
   node[DOM_STASH][2]?.forEach(([c]) => {
-    c.values.pop()
+      throw new Error("STUB");
   })
   if (context[0] !== 1 || !context[1]) {
     apply(node, node.c as Container, false)
@@ -750,18 +697,11 @@ export const update = async (
   }
 
   let resolve: UpdateMapResolve | undefined
-  const promise = new Promise<NodeObject | undefined>((r) => (resolve = r))
+  const promise = new Promise<NodeObject | undefined>((r) => { throw new Error("STUB"); })
   updateMap.set(node, [
     resolve as UpdateMapResolve,
     () => {
-      if (context[2]) {
-        context[2](context, node, (context) => {
-          updateSync(context, node)
-        }).then(() => (resolve as UpdateMapResolve)(node))
-      } else {
-        updateSync(context, node)
-        ;(resolve as UpdateMapResolve)(node)
-      }
+        throw new Error("STUB");
     },
   ])
 
@@ -803,11 +743,7 @@ export const flushSync = (callback: () => void): void => {
   currentUpdateSets.push(set)
   callback()
   set.forEach((node) => {
-    const latest = updateMap.get(node)
-    if (latest) {
-      updateMap.delete(node)
-      latest[1]()
-    }
+      throw new Error("STUB");
   })
   currentUpdateSets.pop()
 }

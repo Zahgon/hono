@@ -74,55 +74,7 @@ const getTime = (): number => {
  * ```
  */
 export const timing = (config?: TimingOptions): MiddlewareHandler => {
-  const options: TimingOptions = {
-    total: true,
-    enabled: true,
-    totalDescription: 'Total Response Time',
-    autoEnd: true,
-    crossOrigin: false,
-    ...config,
-  }
-  return async function timing(c, next) {
-    const headers: string[] = []
-    const timers = new Map<string, Timer>()
-
-    if (c.get('metric')) {
-      return await next()
-    }
-
-    c.set('metric', { headers, timers })
-
-    if (options.total) {
-      startTime(c, 'total', options.totalDescription)
-    }
-    await next()
-
-    if (options.total) {
-      endTime(c, 'total')
-    }
-
-    if (options.autoEnd) {
-      timers.forEach((_, key) => {
-        endTime(c, key)
-      })
-    }
-
-    const enabled = typeof options.enabled === 'function' ? options.enabled(c) : options.enabled
-
-    if (enabled) {
-      c.res.headers.append('Server-Timing', headers.join(','))
-
-      const crossOrigin =
-        typeof options.crossOrigin === 'function' ? options.crossOrigin(c) : options.crossOrigin
-
-      if (crossOrigin) {
-        c.res.headers.append(
-          'Timing-Allow-Origin',
-          typeof crossOrigin === 'string' ? crossOrigin : '*'
-        )
-      }
-    }
-  }
+    throw new Error("STUB");
 }
 
 interface SetMetric {
@@ -248,10 +200,5 @@ export async function wrapTime<T>(
   description?: string,
   precision?: number
 ): Promise<T> {
-  startTime(c, name, description)
-  try {
-    return await callable
-  } finally {
-    endTime(c, name, precision)
-  }
+    throw new Error("STUB");
 }

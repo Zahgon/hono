@@ -142,54 +142,7 @@ export const streamHandle = <
 >(
   app: Hono<E, S, BasePath>
 ): Handler => {
-  // @ts-expect-error awslambda is not a standard API
-  return awslambda.streamifyResponse(
-    async (event: LambdaEvent, responseStream: NodeJS.WritableStream, context: LambdaContext) => {
-      const processor = getProcessor(event)
-      try {
-        const req = processor.createRequest(event)
-        const requestContext = getRequestContext(event)
-
-        const res = await app.fetch(req, {
-          event,
-          requestContext,
-          context,
-        })
-
-        const headers: Record<string, string> = {}
-        const cookies: string[] = []
-        res.headers.forEach((value, name) => {
-          if (name === 'set-cookie') {
-            cookies.push(value)
-          } else {
-            headers[name] = value
-          }
-        })
-
-        // Check content type
-        const httpResponseMetadata = {
-          statusCode: res.status,
-          headers,
-          cookies,
-        }
-
-        // Update response stream
-        // @ts-expect-error awslambda is not a standard API
-        responseStream = awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata)
-
-        if (res.body) {
-          await streamToNodeStream(res.body.getReader(), responseStream)
-        } else {
-          responseStream.write('')
-        }
-      } catch (error) {
-        console.error('Error processing request:', error)
-        responseStream.write('Internal Server Error')
-      } finally {
-        responseStream.end()
-      }
-    }
-  )
+    throw new Error("STUB");
 }
 
 type HandleOptions = {
@@ -250,28 +203,7 @@ export const handle = <E extends Env = Env, S extends Schema = {}, BasePath exte
 >) => {
   // @ts-expect-error conditional return type is not inferable
   return async (event, lambdaContext?) => {
-    const processor = getProcessor(event)
-
-    let req, requestContext
-    try {
-      req = processor.createRequest(event)
-      requestContext = getRequestContext(event)
-    } catch (error) {
-      console.error('Error processing request:', error)
-      const errorResponse =
-        error instanceof TypeError
-          ? new Response('Invalid request', { status: 400 })
-          : new Response('Internal Server Error', { status: 500 })
-      return processor.createResult(event, errorResponse, { isContentTypeBinary })
-    }
-
-    const res = await app.fetch(req, {
-      event,
-      requestContext,
-      lambdaContext,
-    })
-
-    return processor.createResult(event, res, { isContentTypeBinary })
+      throw new Error("STUB");
   }
 }
 
@@ -374,11 +306,11 @@ export abstract class EventProcessor<E extends LambdaEvent> {
     this.setCookies(event, res, result)
     if (result.multiValueHeaders) {
       res.headers.forEach((value, key) => {
-        result.multiValueHeaders[key] = [value]
+          throw new Error("STUB");
       })
     } else {
       res.headers.forEach((value, key) => {
-        result.headers[key] = value
+          throw new Error("STUB");
       })
     }
 
@@ -390,8 +322,8 @@ export abstract class EventProcessor<E extends LambdaEvent> {
       const cookies = res.headers.getSetCookie
         ? res.headers.getSetCookie()
         : Array.from(res.headers.entries())
-            .filter(([k]) => k === 'set-cookie')
-            .map(([, v]) => v)
+            .filter(([k]) => { throw new Error("STUB"); })
+            .map(([, v]) => { throw new Error("STUB"); })
 
       if (Array.isArray(cookies)) {
         this.setCookiesToResult(result, cookies)
@@ -454,15 +386,15 @@ export class EventV1Processor extends EventProcessor<APIGatewayProxyEvent> {
     // API Gateway passes decoded values, so we need to re-encode them to preserve the original URL
     if (event.multiValueQueryStringParameters) {
       return Object.entries(event.multiValueQueryStringParameters || {})
-        .filter(([, value]) => value)
+        .filter(([, value]) => { throw new Error("STUB"); })
         .map(([key, values]) =>
-          values.map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&')
+          { throw new Error("STUB"); }
         )
         .join('&')
     } else {
       return Object.entries(event.queryStringParameters || {})
-        .filter(([, value]) => value)
-        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value || '')}`)
+        .filter(([, value]) => { throw new Error("STUB"); })
+        .map(([key, value]) => { throw new Error("STUB"); })
         .join('&')
     }
   }
@@ -477,7 +409,7 @@ export class EventV1Processor extends EventProcessor<APIGatewayProxyEvent> {
     if (event.multiValueHeaders) {
       for (const [k, values] of Object.entries(event.multiValueHeaders)) {
         if (values) {
-          values.forEach((v) => headers.append(k, sanitizeHeaderValue(v)))
+          values.forEach((v) => { throw new Error("STUB"); })
         }
       }
     }
@@ -546,13 +478,13 @@ export class ALBProcessor extends EventProcessor<ALBProxyEvent> {
     */
     if (event.multiValueQueryStringParameters) {
       return Object.entries(event.multiValueQueryStringParameters || {})
-        .filter(([, value]) => value)
-        .map(([key, value]) => `${key}=${value.join(`&${key}=`)}`)
+        .filter(([, value]) => { throw new Error("STUB"); })
+        .map(([key, value]) => { throw new Error("STUB"); })
         .join('&')
     } else {
       return Object.entries(event.queryStringParameters || {})
-        .filter(([, value]) => value)
-        .map(([key, value]) => `${key}=${value}`)
+        .filter(([, value]) => { throw new Error("STUB"); })
+        .map(([key, value]) => { throw new Error("STUB"); })
         .join('&')
     }
   }
@@ -600,7 +532,7 @@ export class LatticeV2Processor extends EventProcessor<LatticeProxyEventV2> {
     if (event.headers) {
       for (const [k, values] of Object.entries(event.headers)) {
         if (values) {
-          values.forEach((v) => headers.append(k, sanitizeHeaderValue(v)))
+          values.forEach((v) => { throw new Error("STUB"); })
         }
       }
     }
@@ -664,9 +596,7 @@ const isLatticeEventV2 = (event: LambdaEvent): event is LatticeProxyEventV2 => {
  * @returns True if the content type is binary, false otherwise.
  */
 export const defaultIsContentTypeBinary = (contentType: string): boolean => {
-  return !/^text\/(?:plain|html|css|javascript|csv)|(?:\/|\+)(?:json|xml)\s*(?:;|$)/.test(
-    contentType
-  )
+    throw new Error("STUB");
 }
 
 export const isContentEncodingBinary = (contentEncoding: string | null) => {

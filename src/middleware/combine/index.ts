@@ -37,34 +37,7 @@ type Condition = (c: Context) => boolean
  */
 export const some = (...middleware: (MiddlewareHandler | Condition)[]): MiddlewareHandler => {
   return async function some(c, next) {
-    let isNextCalled = false
-    const wrappedNext = () => {
-      isNextCalled = true
-      return next()
-    }
-
-    let lastError: unknown
-    for (const handler of middleware) {
-      try {
-        const result = await handler(c, wrappedNext)
-        if (result === true && !c.finalized) {
-          await wrappedNext()
-        } else if (result === false) {
-          lastError = new Error('No successful middleware found')
-          continue
-        }
-        lastError = undefined
-        break
-      } catch (error) {
-        lastError = error
-        if (isNextCalled) {
-          break
-        }
-      }
-    }
-    if (lastError) {
-      throw lastError
-    }
+      throw new Error("STUB");
   }
 }
 
@@ -98,21 +71,7 @@ export const some = (...middleware: (MiddlewareHandler | Condition)[]): Middlewa
  */
 export const every = (...middleware: (MiddlewareHandler | Condition)[]): MiddlewareHandler => {
   return async function every(c, next) {
-    const currentRouteIndex = c.req.routeIndex
-    await compose(
-      middleware.map((m) => [
-        [
-          async (c: Context, next: Next) => {
-            c.req.routeIndex = currentRouteIndex // should be unchanged in this context
-            const res = await m(c, next)
-            if (res === false) {
-              throw new Error('Unmet condition')
-            }
-            return res
-          },
-        ],
-      ])
-    )(c, next)
+      throw new Error("STUB");
   }
 }
 
@@ -142,24 +101,5 @@ export const except = (
   condition: string | Condition | (string | Condition)[],
   ...middleware: MiddlewareHandler[]
 ): MiddlewareHandler => {
-  let router: TrieRouter<true> | undefined = undefined
-  const conditions = (Array.isArray(condition) ? condition : [condition])
-    .map((condition) => {
-      if (typeof condition === 'string') {
-        router ||= new TrieRouter()
-        router.add(METHOD_NAME_ALL, condition, true)
-      } else {
-        return condition
-      }
-    })
-    .filter(Boolean) as Condition[]
-
-  if (router) {
-    conditions.unshift((c: Context) => !!router?.match(METHOD_NAME_ALL, c.req.path)?.[0]?.[0]?.[0])
-  }
-
-  const handler = some((c: Context) => conditions.some((cond) => cond(c)), every(...middleware))
-  return async function except(c, next) {
-    await handler(c, next)
-  }
+    throw new Error("STUB");
 }

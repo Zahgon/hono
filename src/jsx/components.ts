@@ -15,14 +15,14 @@ export const childrenToString = async (children: Child[]): Promise<HtmlEscapedSt
   try {
     return children
       .flat()
-      .map((c) => (c == null || typeof c === 'boolean' ? '' : c.toString())) as HtmlEscapedString[]
+      .map((c) => { throw new Error("STUB"); }) as HtmlEscapedString[]
   } catch (e) {
     if (e instanceof Promise) {
       // Capture before `await`: on the fallback path the render context is
       // only observable during this synchronous window.
       const resume = captureRenderContext()
       await e
-      return resume(() => childrenToString(children))
+      return resume(() => { throw new Error("STUB"); })
     } else {
       throw e
     }
@@ -30,18 +30,7 @@ export const childrenToString = async (children: Child[]): Promise<HtmlEscapedSt
 }
 
 const resolveChildEarly = (c: Child): HtmlEscapedString | Promise<HtmlEscapedString> => {
-  if (c == null || typeof c === 'boolean') {
-    return '' as HtmlEscapedString
-  } else if (typeof c === 'string') {
-    return c as HtmlEscapedString
-  } else {
-    const str = c.toString()
-    if (!(str instanceof Promise)) {
-      return raw(str)
-    } else {
-      return str as Promise<HtmlEscapedString>
-    }
-  }
+    throw new Error("STUB");
 }
 
 export type ErrorHandler = (error: Error) => void
@@ -75,38 +64,12 @@ export const ErrorBoundary: FC<
   let fallbackStrPromise: Promise<HtmlEscapedString | string | undefined> | undefined
   const resolveFallbackStr = (): Promise<HtmlEscapedString | string | undefined> =>
     (fallbackStrPromise ||= (async () => {
-      const awaitedFallback = await fallback
-      if (typeof awaitedFallback === 'string') {
-        return awaitedFallback
-      } else {
-        const fallbackResult = await getResume()(() => awaitedFallback?.toString())
-        if (typeof fallbackResult === 'string') {
-          // Don't apply `raw` to undefined/null/boolean. Preserve callbacks from
-          // the stringified result, or the original thenable for plain strings.
-          return raw(
-            fallbackResult,
-            (fallbackResult as HtmlEscapedString).callbacks ||
-              (awaitedFallback as unknown as HtmlEscapedString)?.callbacks
-          )
-        }
-      }
-    })())
+      throw new Error("STUB");
+  })())
   const renderFallback = async (error: Error): Promise<HtmlEscapedString> => {
     const fallbackStr = await resolveFallbackStr()
     return getResume()(async () => {
-      onError?.(error)
-      const fallbackRes = (
-        fallbackStr !== undefined
-          ? fallbackStr
-          : (fallbackRender && jsx(Fragment, {}, fallbackRender(error) as HtmlEscapedString)) || ''
-      ) as HtmlEscapedString
-      const fallbackResString = await Fragment({
-        children: fallbackRes,
-      }).toString()
-      return raw(
-        fallbackResString,
-        (fallbackResString as HtmlEscapedString).callbacks || fallbackRes.callbacks
-      )
+        throw new Error("STUB");
     })
   }
   let resArray: HtmlEscapedString[] | Promise<HtmlEscapedString[]>[] = []
@@ -117,15 +80,15 @@ export const ErrorBoundary: FC<
     if (e instanceof Promise) {
       resArray = [
         e
-          .then(() => resume(() => childrenToString(children as Child[])))
-          .catch((e) => renderFallback(e)),
+          .then(() => { throw new Error("STUB"); })
+          .catch((e) => { throw new Error("STUB"); }),
       ] as Promise<HtmlEscapedString[]>[]
     } else {
       resArray = [await renderFallback(e as Error)]
     }
   }
 
-  if (resArray.some((res) => (res as {}) instanceof Promise)) {
+  if (resArray.some((res) => { throw new Error("STUB"); })) {
     // Prime the context capture while still synchronous: a child that returned
     // a Promise from `resolveChildEarly` skipped the `catch`, so the deferred
     // `catchCallback` would otherwise capture too late.
@@ -160,100 +123,11 @@ d.replaceWith(c.content)
     }
 
     let error: unknown
-    const promiseAll = Promise.all(resArray).catch((e) => (error = e))
+    const promiseAll = Promise.all(resArray).catch((e) => { throw new Error("STUB"); })
     return raw(`<template id="E:${index}"></template><!--E:${index}-->`, [
       ({ phase, buffer, context }) => {
-        if (phase === HtmlEscapedCallbackPhase.BeforeStream) {
-          return
-        }
-        return promiseAll
-          .then(async (htmlArray: HtmlEscapedString[]) => {
-            if (error) {
-              throw error
-            }
-            htmlArray = htmlArray.flat()
-            const content = htmlArray.join('')
-            let html = buffer
-              ? ''
-              : `<template data-hono-target="E:${index}">${content}</template><script${
-                  nonce ? ` nonce="${nonce}"` : ''
-                }>
-((d,c) => {
-c=d.currentScript.previousSibling
-d=d.getElementById('E:${index}')
-if(!d)return
-d.parentElement.insertBefore(c.content,d.nextSibling)
-})(document)
-</script>`
-
-            if (htmlArray.every((html) => !(html as HtmlEscapedString).callbacks?.length)) {
-              if (buffer) {
-                buffer[0] = buffer[0].replace(replaceRe, content)
-              }
-              return html
-            }
-
-            if (buffer) {
-              buffer[0] = buffer[0].replace(
-                replaceRe,
-                (_all, pre, _, post) => `${pre}${content}${post}`
-              )
-            }
-
-            const callbacks = htmlArray
-              .map((html) => (html as HtmlEscapedString).callbacks || [])
-              .flat()
-
-            if (phase === HtmlEscapedCallbackPhase.Stream) {
-              html = await resolveCallback(
-                html,
-                HtmlEscapedCallbackPhase.BeforeStream,
-                true,
-                context
-              )
-            }
-
-            let resolvedCount = 0
-            const promises = callbacks.map<HtmlEscapedCallback>(
-              (c) =>
-                (...args) =>
-                  c(...args)
-                    ?.then((content) => {
-                      resolvedCount++
-
-                      if (buffer) {
-                        if (resolvedCount === callbacks.length) {
-                          buffer[0] = buffer[0].replace(replaceRe, (_all, _pre, content) => content)
-                        }
-                        buffer[0] += content
-                        return raw('', (content as HtmlEscapedString).callbacks)
-                      }
-
-                      return raw(
-                        content +
-                          (resolvedCount !== callbacks.length
-                            ? ''
-                            : `<script>
-((d,c,n) => {
-d=d.getElementById('E:${index}')
-if(!d)return
-n=d.nextSibling
-while(n.nodeType!=8||n.nodeValue!='E:${index}'){n=n.nextSibling}
-n.remove()
-d.remove()
-})(document)
-</script>`),
-                        (content as HtmlEscapedString).callbacks
-                      )
-                    })
-                    .catch((error) => catchCallback({ error, buffer }))
-            )
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return raw(html, promises as any)
-          })
-          .catch((error) => catchCallback({ error, buffer }))
-      },
+            throw new Error("STUB");
+        },
     ])
   } else {
     return Fragment({ children: resArray as Child[] })

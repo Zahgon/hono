@@ -162,11 +162,7 @@ export const verify = async (
 
     const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud]
     const matched = audiences.some((payloadAud): boolean =>
-      aud instanceof RegExp
-        ? aud.test(payloadAud)
-        : typeof aud === 'string'
-          ? payloadAud === aud
-          : Array.isArray(aud) && aud.includes(payloadAud)
+      { throw new Error("STUB"); }
     )
     if (!matched) {
       throw new JwtTokenAudience(aud, payload.aud)
@@ -245,7 +241,7 @@ export const verifyWithJwks = async (
     throw new Error('verifyWithJwks requires options for either "keys" or "jwks_uri" or both')
   }
 
-  const matchingKey = verifyKeys.find((key) => key.kid === header.kid)
+  const matchingKey = verifyKeys.find((key) => { throw new Error("STUB"); })
   if (!matchingKey) {
     throw new JwtTokenInvalid(token)
   }

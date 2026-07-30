@@ -87,63 +87,11 @@ export const createCssContext = ({
 
   const newCssClassNameObject = (cssClassName: CssClassNameCommon): Promise<string> => {
     const appendStyle: HtmlEscapedCallback = ({ buffer, context }): Promise<string> | undefined => {
-      const [toAdd, added] = contextMap.get(context) as usedClassNameData
-      const names = Object.keys(toAdd)
-
-      if (!names.length) {
-        return
-      }
-
-      let stylesStr = ''
-      names.forEach((className) => {
-        added[className] = true
-        stylesStr += className.startsWith(PSEUDO_GLOBAL_SELECTOR)
-          ? toAdd[className]
-          : `${className[0] === '@' ? '' : '.'}${className}{${toAdd[className]}}`
-      })
-      contextMap.set(context, [{}, added])
-
-      if (buffer && replaceStyleRe.test(buffer[0])) {
-        buffer[0] = buffer[0].replace(replaceStyleRe, (_, pre, post) => `${pre}${stylesStr}${post}`)
-        return
-      }
-
-      const nonce = nonceMap.get(context)
-      const appendStyleScript = `<script${
-        nonce ? ` nonce="${nonce}"` : ''
-      }>document.querySelector('#${id}').textContent+=${JSON.stringify(stylesStr)}</script>`
-
-      if (buffer) {
-        buffer[0] = `${appendStyleScript}${buffer[0]}`
-        return
-      }
-
-      return Promise.resolve(appendStyleScript)
+        throw new Error("STUB");
     }
 
     const addClassNameToContext: HtmlEscapedCallback = ({ context }) => {
-      if (!contextMap.has(context)) {
-        contextMap.set(context, [{}, {}])
-      }
-      const [toAdd, added] = contextMap.get(context) as usedClassNameData
-      let allAdded = true
-      if (!added[cssClassName[SELECTOR]]) {
-        allAdded = false
-        toAdd[cssClassName[SELECTOR]] = cssClassName[STYLE_STRING]
-      }
-      cssClassName[SELECTORS].forEach(
-        ({ [CLASS_NAME]: className, [STYLE_STRING]: styleString }) => {
-          if (!added[className]) {
-            allAdded = false
-            toAdd[className] = styleString
-          }
-        }
-      )
-      if (allAdded) {
-        return
-      }
-
-      return Promise.resolve(raw('', [appendStyle]))
+        throw new Error("STUB");
     }
 
     // external class names from cx() are untrusted but the result is marked isEscaped,
@@ -171,36 +119,21 @@ export const createCssContext = ({
   }
 
   const cx: CxType = (...args) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    args = cxCommon(args as any) as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return css(Array(args.length).fill('') as any, ...args)
+      throw new Error("STUB");
   }
 
   const keyframes: KeyframesType = (strings, ...values) =>
-    keyframesCommon(strings, values, classNameSlug, onInvalidSlug)
+    { throw new Error("STUB"); }
 
   const viewTransition: ViewTransitionType = ((
     strings: TemplateStringsArray | Promise<string> | undefined,
     ...values: CssVariableType[]
   ) => {
-    return newCssClassNameObject(
-      viewTransitionCommon(strings as any, values, classNameSlug, onInvalidSlug) // eslint-disable-line @typescript-eslint/no-explicit-any
-    )
+      throw new Error("STUB");
   }) as ViewTransitionType
 
   const Style: StyleType = ({ children, nonce } = {}) =>
-    raw(
-      `<style id="${id}"${nonce ? ` nonce="${nonce}"` : ''}>${
-        children ? (children as unknown as CssClassName)[STYLE_STRING] : ''
-      }</style>`,
-      [
-        ({ context }) => {
-          nonceMap.set(context, nonce)
-          return undefined
-        },
-      ]
-    )
+    { throw new Error("STUB"); }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(Style as any)[DOM_RENDERER] = StyleRenderToDom

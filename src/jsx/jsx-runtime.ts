@@ -17,35 +17,7 @@ export const jsxAttr = (
   key: string,
   v: string | Promise<string> | Record<string, string | number | null | undefined | boolean>
 ): HtmlEscapedString | Promise<HtmlEscapedString> => {
-  if (!isValidAttributeName(key)) {
-    return raw('')
-  }
-  const buffer: StringBuffer = [`${key}="`] as StringBuffer
-  if (key === 'style' && typeof v === 'object') {
-    // object to style strings
-    let styleStr = ''
-    styleObjectForEach(v as Record<string, string | number>, (property, value) => {
-      if (value != null) {
-        styleStr += `${styleStr ? ';' : ''}${property}:${value}`
-      }
-    })
-    escapeToBuffer(styleStr, buffer)
-    buffer[0] += '"'
-  } else if (typeof v === 'string') {
-    escapeToBuffer(v, buffer)
-    buffer[0] += '"'
-  } else if (v === null || v === undefined) {
-    return raw('')
-  } else if (typeof v === 'number' || (v as unknown as HtmlEscaped).isEscaped) {
-    buffer[0] += `${v}"`
-  } else if (v instanceof Promise) {
-    buffer.unshift('"', v)
-  } else {
-    escapeToBuffer(v.toString(), buffer)
-    buffer[0] += '"'
-  }
-
-  return buffer.length === 1 ? raw(buffer[0]) : stringBufferToString(buffer, undefined)
+    throw new Error("STUB");
 }
 
-export const jsxEscape = (value: string) => value
+export const jsxEscape = (value: string) => { throw new Error("STUB"); }

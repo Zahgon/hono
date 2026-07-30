@@ -122,17 +122,7 @@ export const combineBeforeRequestHooks = (
     return hooks
   }
   return async (req: Request): Promise<Request | false> => {
-    let currentReq = req
-    for (const hook of hooks) {
-      const result = await hook(currentReq)
-      if (result === false) {
-        return false
-      }
-      if (result instanceof Request) {
-        currentReq = result
-      }
-    }
-    return currentReq
+      throw new Error("STUB");
   }
 }
 
@@ -143,17 +133,7 @@ export const combineAfterResponseHooks = (
     return hooks
   }
   return async (res: Response): Promise<Response | false> => {
-    let currentRes = res
-    for (const hook of hooks) {
-      const result = await hook(currentRes)
-      if (result === false) {
-        return false
-      }
-      if (result instanceof Response) {
-        currentRes = result
-      }
-    }
-    return currentRes
+      throw new Error("STUB");
   }
 }
 
@@ -166,9 +146,7 @@ export const combineAfterGenerateHooks = (
     return hooks
   }
   return async (result: ToSSGResult): Promise<void> => {
-    for (const hook of hooks) {
-      await hook(result, fsModule, options)
-    }
+      throw new Error("STUB");
   }
 }
 
@@ -230,73 +208,7 @@ export const fetchRoutesContent = function* <
 
     // eslint-disable-next-line no-async-promise-executor
     yield new Promise(async (resolveGetInfo, rejectGetInfo) => {
-      try {
-        if (beforeRequestHook) {
-          const maybeRequest = await beforeRequestHook(forGetInfoURLRequest)
-          if (!maybeRequest) {
-            resolveGetInfo(undefined)
-            return
-          }
-          forGetInfoURLRequest = maybeRequest as unknown as AddedSSGDataRequest
-        }
-
-        await pool.run(() => app.fetch(forGetInfoURLRequest, { [SSG_CONTEXT]: true }))
-
-        if (!forGetInfoURLRequest.ssgParams) {
-          if (isDynamicRoute(route.path)) {
-            resolveGetInfo(undefined)
-            return
-          }
-          forGetInfoURLRequest.ssgParams = [{}]
-        }
-
-        const requestInit = {
-          method: forGetInfoURLRequest.method,
-          headers: forGetInfoURLRequest.headers,
-        }
-
-        resolveGetInfo(
-          (function* () {
-            for (const param of forGetInfoURLRequest.ssgParams as SSGParams) {
-              // eslint-disable-next-line no-async-promise-executor
-              yield new Promise(async (resolveReq, rejectReq) => {
-                try {
-                  const replacedUrlParam = replaceUrlParam(route.path, param)
-                  let response = await pool.run(() =>
-                    app.request(replacedUrlParam, requestInit, {
-                      [SSG_CONTEXT]: true,
-                    })
-                  )
-                  if (response.headers.get(X_HONO_DISABLE_SSG_HEADER_KEY)) {
-                    resolveReq(undefined)
-                    return
-                  }
-                  if (afterResponseHook) {
-                    const maybeResponse = await afterResponseHook(response)
-                    if (!maybeResponse) {
-                      resolveReq(undefined)
-                      return
-                    }
-                    response = maybeResponse
-                  }
-                  const mimeType =
-                    response.headers.get('Content-Type')?.split(';')[0] || DEFAULT_CONTENT_TYPE
-                  const content = await parseResponseContent(response)
-                  resolveReq({
-                    routePath: replacedUrlParam,
-                    mimeType,
-                    content,
-                  })
-                } catch (error) {
-                  rejectReq(error)
-                }
-              })
-            }
-          })()
-        )
-      } catch (error) {
-        rejectGetInfo(error)
-      }
+        throw new Error("STUB");
     })
   }
 }
@@ -366,105 +278,5 @@ export interface ToSSGAdaptorInterface<
  * The API might be changed.
  */
 export const toSSG: ToSSGInterface = async (app, fs, options) => {
-  let result: ToSSGResult | undefined
-  const getInfoPromises: Promise<unknown>[] = []
-  const savePromises: Promise<string | undefined>[] = []
-  const plugins = options?.plugins || [defaultPlugin()]
-  const beforeRequestHooks: BeforeRequestHook[] = []
-  const afterResponseHooks: AfterResponseHook[] = []
-  const afterGenerateHooks: AfterGenerateHook[] = []
-  if (options?.beforeRequestHook) {
-    beforeRequestHooks.push(
-      ...(Array.isArray(options.beforeRequestHook)
-        ? options.beforeRequestHook
-        : [options.beforeRequestHook])
-    )
-  }
-  if (options?.afterResponseHook) {
-    afterResponseHooks.push(
-      ...(Array.isArray(options.afterResponseHook)
-        ? options.afterResponseHook
-        : [options.afterResponseHook])
-    )
-  }
-  if (options?.afterGenerateHook) {
-    afterGenerateHooks.push(
-      ...(Array.isArray(options.afterGenerateHook)
-        ? options.afterGenerateHook
-        : [options.afterGenerateHook])
-    )
-  }
-  for (const plugin of plugins) {
-    if (plugin.beforeRequestHook) {
-      beforeRequestHooks.push(
-        ...(Array.isArray(plugin.beforeRequestHook)
-          ? plugin.beforeRequestHook
-          : [plugin.beforeRequestHook])
-      )
-    }
-    if (plugin.afterResponseHook) {
-      afterResponseHooks.push(
-        ...(Array.isArray(plugin.afterResponseHook)
-          ? plugin.afterResponseHook
-          : [plugin.afterResponseHook])
-      )
-    }
-    if (plugin.afterGenerateHook) {
-      afterGenerateHooks.push(
-        ...(Array.isArray(plugin.afterGenerateHook)
-          ? plugin.afterGenerateHook
-          : [plugin.afterGenerateHook])
-      )
-    }
-  }
-  try {
-    const outputDir = options?.dir ?? DEFAULT_OUTPUT_DIR
-    const concurrency = options?.concurrency ?? DEFAULT_CONCURRENCY
-
-    const combinedBeforeRequestHook = combineBeforeRequestHooks(
-      beforeRequestHooks.length > 0 ? beforeRequestHooks : [(req) => req]
-    )
-    const combinedAfterResponseHook = combineAfterResponseHooks(
-      afterResponseHooks.length > 0 ? afterResponseHooks : [(req) => req]
-    )
-    const getInfoGen = fetchRoutesContent(
-      app,
-      combinedBeforeRequestHook,
-      combinedAfterResponseHook,
-      concurrency
-    )
-    for (const getInfo of getInfoGen) {
-      getInfoPromises.push(
-        getInfo.then((getContentGen) => {
-          if (!getContentGen) {
-            return
-          }
-          for (const content of getContentGen) {
-            savePromises.push(
-              saveContentToFile(content, fs, outputDir, options?.extensionMap).catch((e) => e)
-            )
-          }
-        })
-      )
-    }
-    await Promise.all(getInfoPromises)
-    const files: string[] = []
-    for (const savePromise of savePromises) {
-      const fileOrError = await savePromise
-      if (typeof fileOrError === 'string') {
-        files.push(fileOrError)
-      } else if (fileOrError) {
-        throw fileOrError
-      }
-    }
-    result = { success: true, files }
-  } catch (error) {
-    const errorObj = error instanceof Error ? error : new Error(String(error))
-    result = { success: false, files: [], error: errorObj }
-  }
-  if (afterGenerateHooks.length > 0) {
-    const combinedAfterGenerateHooks = combineAfterGenerateHooks(afterGenerateHooks, fs, options)
-    await combinedAfterGenerateHooks(result, fs, options)
-  }
-  return result
+    throw new Error("STUB");
 }

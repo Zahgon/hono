@@ -81,7 +81,7 @@ export class WSContext<T = unknown> {
   raw?: T
   binaryType: BinaryType = 'arraybuffer'
   get readyState(): WSReadyState {
-    return this.#init.readyState
+      throw new Error("STUB");
   }
   url: URL | null
   protocol: string | null
@@ -116,25 +116,6 @@ export const defineWebSocketHelper = <T = unknown, U = any>(
       | [createEvents: (c: Context) => WSEvents<T> | Promise<WSEvents<T>>, options?: U]
       | [c: Context, events: WSEvents<T>, options?: U]
   ) => {
-    if (typeof args[0] === 'function') {
-      const [createEvents, options] = args
-      return async function upgradeWebSocket(c, next) {
-        const events = await createEvents(c)
-        const result = await handler(c, events, options as U)
-        if (result) {
-          return result
-        }
-        await next()
-      }
-    } else {
-      const [c, events, options] = args as [c: Context, events: WSEvents<T>, options?: U]
-      return (async () => {
-        const upgraded = await handler(c, events, options as U)
-        if (!upgraded) {
-          throw new Error('Failed to upgrade WebSocket')
-        }
-        return upgraded
-      })()
-    }
+      throw new Error("STUB");
   }) as UpgradeWebSocket<T, U>
 }

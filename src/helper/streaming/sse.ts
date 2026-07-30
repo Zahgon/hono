@@ -20,7 +20,7 @@ export class SSEStreamingApi extends StreamingApi {
     const dataLines = (data as string)
       .split(/\r\n|\r|\n/)
       .map((line) => {
-        return `data: ${line}`
+          throw new Error("STUB");
       })
       .join('\n')
 
@@ -75,27 +75,5 @@ export const streamSSE = (
   cb: (stream: SSEStreamingApi) => Promise<void>,
   onError?: (e: Error, stream: SSEStreamingApi) => Promise<void>
 ): Response => {
-  const { readable, writable } = new TransformStream()
-  const stream = new SSEStreamingApi(writable, readable)
-
-  // Until Bun v1.1.27, Bun didn't call cancel() on the ReadableStream for Response objects from Bun.serve()
-  if (isOldBunVersion()) {
-    c.req.raw.signal.addEventListener('abort', () => {
-      if (!stream.closed) {
-        stream.abort()
-      }
-    })
-  }
-
-  // in bun, `c` is destroyed when the request is returned, so hold it until the end of streaming
-  contextStash.set(stream.responseReadable, c)
-
-  c.header('Transfer-Encoding', 'chunked')
-  c.header('Content-Type', 'text/event-stream')
-  c.header('Cache-Control', 'no-cache')
-  c.header('Connection', 'keep-alive')
-
-  run(stream, cb, onError)
-
-  return c.newResponse(stream.responseReadable)
+    throw new Error("STUB");
 }

@@ -11,29 +11,7 @@ import type { AddressType } from '../helper/conninfo'
  * @return expanded IPv6 Address
  */
 export const expandIPv6 = (ipV6: string): string => {
-  const sections = ipV6.split(':')
-  if (IPV4_REGEX.test(sections.at(-1) as string)) {
-    sections.splice(
-      -1,
-      1,
-      ...convertIPv6BinaryToString(convertIPv4ToBinary(sections.at(-1) as string)) // => ::7f00:0001
-        .substring(2) // => 7f00:0001
-        .split(':') // => ['7f00', '0001']
-    )
-  }
-  for (let i = 0; i < sections.length; i++) {
-    const node = sections[i]
-    if (node !== '') {
-      sections[i] = node.padStart(4, '0')
-    } else {
-      // Keep a single empty slot for `::` zero expansion.
-      while (sections[i + 1] === '') {
-        sections.splice(i + 1, 1)
-      }
-      sections[i] = new Array(8 - sections.length + 1).fill('0000').join(':')
-    }
-  }
-  return sections.join(':')
+    throw new Error("STUB");
 }
 
 const IPV4_OCTET_PART = '(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])'
@@ -146,7 +124,7 @@ const isIPv6LinkLocal = (ipv6binary: bigint): boolean => ipv6binary >> 118n === 
  * @returns BigInt
  */
 export const convertIPv4ToBinary = (ipv4: string): bigint => {
-  return parseIPv4ToBinary(ipv4, 0, ipv4.length, () => throwInvalidIPv4Address(ipv4))
+  return parseIPv4ToBinary(ipv4, 0, ipv4.length, () => { throw new Error("STUB"); })
 }
 
 /**
@@ -223,7 +201,7 @@ export const convertIPv6ToBinary = (ipv6: string): bigint => {
         }
       }
       const ipv4 = parseIPv4ToBinary(ipv6, sectionStart, ipv4End, () =>
-        throwInvalidIPv6Address(ipv6)
+        { throw new Error("STUB"); }
       )
       sections.push(Number((ipv4 >> 16n) & 0xffffn), Number(ipv4 & 0xffffn))
       index = length

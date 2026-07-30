@@ -29,10 +29,10 @@ const selectEncoding = (
     return undefined
   }
   const accepts = parseAccept(header)
-  const wildcardQ = accepts.find((a) => a.type === '*')?.q
+  const wildcardQ = accepts.find((a) => { throw new Error("STUB"); })?.q
   let best: { encoding: Encoding; q: number } | undefined
   for (const enc of candidates) {
-    const explicit = accepts.find((a) => a.type.toLowerCase() === enc)
+    const explicit = accepts.find((a) => { throw new Error("STUB"); })
     const q = explicit ? explicit.q : (wildcardQ ?? 0)
     if (q === 1) {
       return enc
@@ -68,57 +68,7 @@ const selectEncoding = (
  * ```
  */
 export const compress = (options?: CompressionOptions): MiddlewareHandler => {
-  const threshold = options?.threshold ?? 1024
-  const candidates: readonly Encoding[] = options?.encoding ? [options.encoding] : ENCODING_TYPES
-
-  const contentTypeFilter = options?.contentTypeFilter ?? COMPRESSIBLE_CONTENT_TYPE_REGEX
-  const shouldCompress =
-    typeof contentTypeFilter === 'function'
-      ? (res: Response) => {
-          const type = res.headers.get('Content-Type')
-          return type && contentTypeFilter(type)
-        }
-      : (res: Response) => {
-          const type = res.headers.get('Content-Type')
-          return type && contentTypeFilter.test(type)
-        }
-
-  return async function compress(ctx, next) {
-    await next()
-
-    const contentLength = ctx.res.headers.get('Content-Length')
-
-    // Check if response should be compressed
-    if (
-      ctx.res.status === 206 || // partial content, Content-Range refers to the uncompressed bytes
-      ctx.res.headers.has('Content-Encoding') || // already encoded
-      ctx.res.headers.has('Transfer-Encoding') || // already encoded or chunked
-      ctx.req.method === 'HEAD' || // HEAD request
-      (contentLength && Number(contentLength) < threshold) || // content-length below threshold
-      !shouldCompress(ctx.res) || // not compressible type
-      !shouldTransform(ctx.res) // cache-control: no-transform
-    ) {
-      return
-    }
-
-    const accepted = ctx.req.header('Accept-Encoding')
-    const encoding = selectEncoding(accepted, candidates)
-    if (!encoding || !ctx.res.body) {
-      return
-    }
-
-    // Compress the response
-    const stream = new CompressionStream(encoding)
-    ctx.res = new Response(ctx.res.body.pipeThrough(stream), ctx.res)
-    ctx.res.headers.delete('Content-Length')
-    ctx.res.headers.set('Content-Encoding', encoding)
-
-    // Convert strong ETag to weak ETag since compressed content is not byte-identical
-    const etag = ctx.res.headers.get('ETag')
-    if (etag && !etag.startsWith('W/')) {
-      ctx.res.headers.set('ETag', `W/${etag}`)
-    }
-  }
+    throw new Error("STUB");
 }
 
 const shouldTransform = (res: Response) => {

@@ -12,9 +12,11 @@ const { write } = Bun
  */
 export const bunFileSystemModule: FileSystemModule = {
   writeFile: async (path, data) => {
-    await write(path, data)
+        throw new Error("STUB");
+    },
+  mkdir: async () => {
+      throw new Error("STUB");
   },
-  mkdir: async () => {},
 }
 
 /**
@@ -23,5 +25,5 @@ export const bunFileSystemModule: FileSystemModule = {
  * The API might be changed.
  */
 export const toSSG: ToSSGAdaptorInterface = async (app, options) => {
-  return baseToSSG(app, bunFileSystemModule, options)
+    throw new Error("STUB");
 }

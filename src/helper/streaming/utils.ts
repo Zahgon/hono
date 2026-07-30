@@ -6,6 +6,6 @@ export let isOldBunVersion = (): boolean => {
   }
   const result = version.startsWith('1.1') || version.startsWith('1.0') || version.startsWith('0.')
   // Avoid running this check on every call
-  isOldBunVersion = () => result
+  isOldBunVersion = () => { throw new Error("STUB"); }
   return result
 }

@@ -21,13 +21,8 @@ export class PatternRouter<T> implements Router<T> {
 
     const parts = (path.match(/\/?(:\w+(?:{(?:(?:{[\d,]+})|[^}])+})?)|\/?[^\/\?]+/g) || []).map(
       (part) => {
-        const match = part.match(/^\/:([^{]+)(?:{(.*)})?/)
-        return match
-          ? `/(?<${match[1]}>${match[2] || '[^/]+'})`
-          : part === '/*'
-            ? '/[^/]+'
-            : part.replace(/[.\\+*[^\]$()]/g, '\\$&')
-      }
+            throw new Error("STUB");
+        }
     )
 
     try {

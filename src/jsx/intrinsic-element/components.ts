@@ -26,68 +26,7 @@ const insertIntoHead: (
 ) => HtmlEscapedCallback =
   (tagName, tag, props, precedence) =>
   ({ buffer, context }): undefined => {
-    if (!buffer) {
-      return
-    }
-    const map = metaTagMap.get(context) || {}
-    metaTagMap.set(context, map)
-    const tags = (map[tagName] ||= [])
-
-    let duped = false
-    const deDupeKeys = deDupeKeyMap[tagName]
-    const deDupeByKey = shouldDeDupeByKey(tagName, precedence !== undefined)
-    if (deDupeByKey) {
-      LOOP: for (const [, tagProps] of tags) {
-        if (
-          tagName === 'link' &&
-          !(tagProps.rel === 'stylesheet' && tagProps[dataPrecedenceAttr] !== undefined)
-        ) {
-          continue
-        }
-        for (const key of deDupeKeys) {
-          if ((tagProps?.[key] ?? null) === props?.[key]) {
-            duped = true
-            break LOOP
-          }
-        }
-      }
-    }
-
-    if (duped) {
-      buffer[0] = buffer[0].replaceAll(tag, '')
-    } else if (deDupeByKey || tagName === 'link') {
-      tags.push([tag, props, precedence])
-    } else {
-      tags.unshift([tag, props, precedence])
-    }
-
-    if (buffer[0].indexOf('</head>') !== -1) {
-      let insertTags
-      if (tagName === 'link' || precedence !== undefined) {
-        const precedences: string[] = []
-        insertTags = tags
-          .map(([tag, , tagPrecedence], index) => {
-            if (tagPrecedence === undefined) {
-              return [tag, Number.MAX_SAFE_INTEGER, index] as [string, number, number]
-            }
-            let order = precedences.indexOf(tagPrecedence as string)
-            if (order === -1) {
-              precedences.push(tagPrecedence as string)
-              order = precedences.length - 1
-            }
-            return [tag, order, index] as [string, number, number]
-          })
-          .sort((a, b) => a[1] - b[1] || a[2] - b[2])
-          .map(([tag]) => tag)
-      } else {
-        insertTags = tags.map(([tag]) => tag)
-      }
-
-      insertTags.forEach((tag) => {
-        buffer[0] = buffer[0].replaceAll(tag, '')
-      })
-      buffer[0] = buffer[0].replace(/(?=<\/head>)/, insertTags.join(''))
-    }
+      throw new Error("STUB");
   }
 
 const returnWithoutSpecialBehavior = (tag: string, children: Child, props: Props) =>
@@ -108,10 +47,7 @@ const documentMetadataTag = (tag: string, children: Child, props: Props, sort: b
 
   if (string instanceof Promise) {
     return string.then((resString) =>
-      raw(string, [
-        ...((resString as HtmlEscapedString).callbacks || []),
-        insertIntoHead(tag, resString, restProps, precedence),
-      ])
+      { throw new Error("STUB"); }
     )
   } else {
     return raw(string, [insertIntoHead(tag, string, restProps, precedence)])
@@ -119,61 +55,26 @@ const documentMetadataTag = (tag: string, children: Child, props: Props, sort: b
 }
 
 export const title: FC<PropsWithChildren> = ({ children, ...props }) => {
-  const nameSpaceContext = getNameSpaceContext()
-  if (nameSpaceContext) {
-    const context = useContext(nameSpaceContext)
-    if (context === 'svg' || context === 'head') {
-      return new JSXNode(
-        'title',
-        props,
-        toArray(children ?? []) as Child[]
-      ) as unknown as HtmlEscapedString
-    }
-  }
-
-  return documentMetadataTag('title', children, props, false)
+    throw new Error("STUB");
 }
 export const script: FC<PropsWithChildren<IntrinsicElements['script']>> = ({
   children,
   ...props
 }) => {
-  const nameSpaceContext = getNameSpaceContext()
-  if (
-    ['src', 'async'].some((k) => !props[k]) ||
-    (nameSpaceContext && useContext(nameSpaceContext) === 'head')
-  ) {
-    return returnWithoutSpecialBehavior('script', children, props)
-  }
-
-  return documentMetadataTag('script', children, props, false)
+    throw new Error("STUB");
 }
 
 export const style: FC<PropsWithChildren<IntrinsicElements['style']>> = ({
   children,
   ...props
 }) => {
-  if (!['href', 'precedence'].every((k) => k in props)) {
-    return returnWithoutSpecialBehavior('style', children, props)
-  }
-  props['data-href'] = props.href
-  delete props.href
-  return documentMetadataTag('style', children, props, true)
+    throw new Error("STUB");
 }
 export const link: FC<PropsWithChildren<IntrinsicElements['link']>> = ({ children, ...props }) => {
-  if (
-    ['onLoad', 'onError'].some((k) => k in props) ||
-    (props.rel === 'stylesheet' && (!('precedence' in props) || 'disabled' in props))
-  ) {
-    return returnWithoutSpecialBehavior('link', children, props)
-  }
-  return documentMetadataTag('link', children, props, isStylesheetLinkWithPrecedence(props))
+    throw new Error("STUB");
 }
 export const meta: FC<PropsWithChildren> = ({ children, ...props }) => {
-  const nameSpaceContext = getNameSpaceContext()
-  if (nameSpaceContext && useContext(nameSpaceContext) === 'head') {
-    return returnWithoutSpecialBehavior('meta', children, props)
-  }
-  return documentMetadataTag('meta', children, props, false)
+    throw new Error("STUB");
 }
 
 const newJSXNode = (tag: string, { children, ...props }: PropsWithChildren<unknown>) =>
@@ -185,10 +86,7 @@ export const form: FC<
     method?: 'get' | 'post'
   }>
 > = (props) => {
-  if (typeof props.action === 'function') {
-    props.action = PERMALINK in props.action ? (props.action[PERMALINK] as string) : undefined
-  }
-  return newJSXNode('form', props)
+    throw new Error("STUB");
 }
 
 const formActionableElement = (
@@ -205,6 +103,6 @@ const formActionableElement = (
 }
 
 export const input: (props: PropsWithChildren) => unknown = (props) =>
-  formActionableElement('input', props)
+  { throw new Error("STUB"); }
 export const button: (props: PropsWithChildren) => unknown = (props) =>
-  formActionableElement('button', props)
+  { throw new Error("STUB"); }

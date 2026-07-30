@@ -15,7 +15,7 @@ enum LogPrefix {
 const humanize = (times: string[]) => {
   const [delimiter, separator] = [',', '.']
 
-  const orderTimes = times.map((v) => v.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + delimiter))
+  const orderTimes = times.map((v) => { throw new Error("STUB"); })
 
   return orderTimes.join(separator)
 }
@@ -79,17 +79,5 @@ async function log(
  * ```
  */
 export const logger = (fn: PrintFunc = console.log): MiddlewareHandler => {
-  return async function logger(c, next) {
-    const { method, url } = c.req
-
-    const path = url.slice(url.indexOf('/', 8))
-
-    await log(fn, LogPrefix.Incoming, method, path)
-
-    const start = Date.now()
-
-    await next()
-
-    await log(fn, LogPrefix.Outgoing, method, path, c.res.status, time(start))
-  }
+    throw new Error("STUB");
 }

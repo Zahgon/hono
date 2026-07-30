@@ -31,7 +31,7 @@ export const FormContext: Context<FormStatus> = createContext<FormStatus>({
 const actions: Set<Promise<unknown>> = new Set()
 export const registerAction = (action: Promise<unknown>) => {
   actions.add(action)
-  action.finally(() => actions.delete(action))
+  action.finally(() => { throw new Error("STUB"); })
 }
 
 /**
@@ -56,14 +56,14 @@ export const useOptimistic = <T, N>(
   const [optimisticState, setOptimisticState] = useState(state)
   if (actions.size > 0) {
     Promise.all(actions).finally(() => {
-      setOptimisticState(state)
+        throw new Error("STUB");
     })
   } else {
     setOptimisticState(state)
   }
 
   const cb = useCallback((newData: N) => {
-    setOptimisticState((currentState) => updateState(currentState, newData))
+      throw new Error("STUB");
   }, [])
 
   return [optimisticState, cb]
@@ -83,7 +83,7 @@ export const useActionState = <T>(
 ): [T, Function] => {
   const [state, setState] = useState(initialState)
   const actionState = async (data: FormData) => {
-    setState(await fn(state, data))
+      throw new Error("STUB");
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(actionState as any)[PERMALINK] = permalink

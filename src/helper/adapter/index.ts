@@ -23,18 +23,16 @@ export const env = <
   runtime ??= getRuntimeKey()
 
   const runtimeEnvHandlers: Record<string, () => T> = {
-    bun: () => globalEnv,
-    node: () => globalEnv,
-    'edge-light': () => globalEnv,
+    bun: () => { throw new Error("STUB"); },
+    node: () => { throw new Error("STUB"); },
+    'edge-light': () => { throw new Error("STUB"); },
     deno: () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      return Deno.env.toObject() as T
+        throw new Error("STUB");
     },
-    workerd: () => c.env,
+    workerd: () => { throw new Error("STUB"); },
     // On Fastly Compute, you can use the ConfigStore to manage user-defined data.
-    fastly: () => ({}) as T,
-    other: () => ({}) as T,
+    fastly: () => { throw new Error("STUB"); },
+    other: () => { throw new Error("STUB"); },
   }
 
   return runtimeEnvHandlers[runtime]()

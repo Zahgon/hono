@@ -77,7 +77,7 @@ const memo = <T>(
   component: FC<T>,
   propsAreEqual: (prevProps: Readonly<T>, nextProps: Readonly<T>) => boolean = shallowEqual
 ): FC<T> => {
-  const wrapper = ((props: T) => component(props)) as MemorableFC<T>
+  const wrapper = ((props: T) => { throw new Error("STUB"); }) as MemorableFC<T>
   wrapper[DOM_MEMO] = propsAreEqual
   return wrapper as FC<T>
 }

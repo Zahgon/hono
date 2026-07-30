@@ -17,9 +17,7 @@ export class PreparedRegExpRouter<T> implements Router<T> {
   }
 
   #addWildcard(method: string, handlerData: [T, ParamIndexMap]) {
-    const matcher = this.#matchers[method] as Matcher<T>
-    matcher[1].forEach((list) => list && list.push(handlerData))
-    Object.values(matcher[2]).forEach((list) => (list[0] as [T, ParamIndexMap][]).push(handlerData))
+      throw new Error("STUB");
   }
 
   #addPath(
@@ -29,19 +27,7 @@ export class PreparedRegExpRouter<T> implements Router<T> {
     indexes: (number | string)[],
     map: ParamIndexMap | undefined
   ) {
-    const matcher = this.#matchers[method] as Matcher<T>
-    if (!map) {
-      // assumed to be a static route
-      matcher[2][path][0].push([handler, {}])
-    } else {
-      indexes.forEach((index) => {
-        if (typeof index === 'number') {
-          matcher[1][index].push([handler, map])
-        } else {
-          ;(matcher[2][index || path][0] as [T, ParamIndexMap][]).push([handler, map])
-        }
-      })
-    }
+      throw new Error("STUB");
   }
 
   add(method: string, path: string, handler: T) {
@@ -53,7 +39,7 @@ export class PreparedRegExpRouter<T> implements Router<T> {
       }
       this.#matchers[method] = [
         all[0],
-        all[1].map((list) => (Array.isArray(list) ? list.slice() : 0)) as HandlerData<T>[],
+        all[1].map((list) => { throw new Error("STUB"); }) as HandlerData<T>[],
         staticMap,
       ]
     }
@@ -95,71 +81,11 @@ export class PreparedRegExpRouter<T> implements Router<T> {
 export const buildInitParams: (params: {
   paths: string[]
 }) => ConstructorParameters<typeof PreparedRegExpRouter> = ({ paths }) => {
-  const RegExpRouterWithMatcherExport = class<T> extends RegExpRouter<T> {
-    buildAndExportAllMatchers() {
-      return this.buildAllMatchers()
-    }
-  }
-  const router = new RegExpRouterWithMatcherExport<string>()
-  for (const path of paths) {
-    router.add(METHOD_NAME_ALL, path, path)
-  }
-
-  const matchers = router.buildAndExportAllMatchers()
-  const all = matchers[METHOD_NAME_ALL] as Matcher<string>
-
-  const relocateMap: RelocateMap = {}
-  for (const path of paths) {
-    if (path === '/*' || path === '*') {
-      continue
-    }
-    all[1].forEach((list, i) => {
-      list.forEach(([p, map]) => {
-        if (p === path) {
-          if (relocateMap[path]) {
-            relocateMap[path][0][1] = {
-              ...relocateMap[path][0][1],
-              ...map,
-            }
-          } else {
-            relocateMap[path] = [[[], map]]
-          }
-          if (relocateMap[path][0][0].findIndex((j) => j === i) === -1) {
-            relocateMap[path][0][0].push(i)
-          }
-        }
-      })
-    })
-    for (const path2 in all[2]) {
-      all[2][path2][0].forEach(([p]) => {
-        if (p === path) {
-          relocateMap[path] ||= [[[]]]
-          const value = path2 === path ? '' : path2
-          if (relocateMap[path][0][0].findIndex((v) => v === value) === -1) {
-            relocateMap[path][0][0].push(value)
-          }
-        }
-      })
-    }
-  }
-
-  for (let i = 0, len = all[1].length; i < len; i++) {
-    all[1][i] = all[1][i] ? [] : (0 as unknown as HandlerData<string>)
-  }
-  for (const path in all[2]) {
-    all[2][path][0] = []
-  }
-
-  return [matchers, relocateMap]
+    throw new Error("STUB");
 }
 
 export const serializeInitParams: (
   params: ConstructorParameters<typeof PreparedRegExpRouter>
 ) => string = ([matchers, relocateMap]) => {
-  // Embed the regular expression as a result of `toString()` so that it can be evaluated as JavaScript.
-  const matchersStr = JSON.stringify(matchers, (_, value) =>
-    value instanceof RegExp ? `##${value.toString()}##` : value
-  ).replace(/"##(.+?)##"/g, (_, str) => str.replace(/\\\\/g, '\\'))
-  const relocateMapStr = JSON.stringify(relocateMap)
-  return `[${matchersStr},${relocateMapStr}]`
+    throw new Error("STUB");
 }

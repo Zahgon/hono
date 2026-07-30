@@ -21,7 +21,7 @@ export const createPool = ({
   if (concurrency === Infinity) {
     // unlimited
     return {
-      run: async (fn) => fn(),
+      run: async (fn) => { throw new Error("STUB"); },
     }
   }
 
@@ -32,15 +32,15 @@ export const createPool = ({
     resolve?: (result: T) => void
   ): Promise<T> => {
     if (pool.size >= (concurrency as number)) {
-      promise ||= new Promise<T>((r) => (resolve = r))
-      setTimeout(() => run(fn, promise, resolve))
+      promise ||= new Promise<T>((r) => { throw new Error("STUB"); })
+      setTimeout(() => { throw new Error("STUB"); })
       return promise
     }
     const marker = {}
     pool.add(marker)
     const result = await fn()
     if (interval) {
-      setTimeout(() => pool.delete(marker), interval)
+      setTimeout(() => { throw new Error("STUB"); }, interval)
     } else {
       pool.delete(marker)
     }

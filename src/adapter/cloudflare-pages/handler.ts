@@ -34,15 +34,7 @@ export const handle =
     app: Hono<E, S, BasePath>
   ): PagesFunction<E['Bindings']> =>
   (eventContext) => {
-    return app.fetch(
-      eventContext.request,
-      { ...eventContext.env, eventContext },
-      {
-        waitUntil: eventContext.waitUntil,
-        passThroughOnException: eventContext.passThroughOnException,
-        props: {},
-      }
-    )
+      throw new Error("STUB");
   }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,48 +49,7 @@ export function handleMiddleware<E extends Env = {}, P extends string = any, I e
     I
   >
 ): PagesFunction<E['Bindings']> {
-  return async (executionCtx) => {
-    const context = new Context(executionCtx.request, {
-      env: { ...executionCtx.env, eventContext: executionCtx },
-      executionCtx,
-    })
-
-    let response: Response | void = undefined
-
-    try {
-      response = await middleware(context, async () => {
-        try {
-          context.res = await executionCtx.next()
-        } catch (error) {
-          if (error instanceof Error) {
-            context.error = error
-          } else {
-            throw error
-          }
-        }
-      })
-    } catch (error) {
-      if (error instanceof Error) {
-        context.error = error
-      } else {
-        throw error
-      }
-    }
-
-    if (response) {
-      return response
-    }
-
-    if (context.error instanceof HTTPException) {
-      return context.error.getResponse()
-    }
-
-    if (context.error) {
-      throw context.error
-    }
-
-    return context.res
-  }
+    throw new Error("STUB");
 }
 
 declare abstract class FetcherLike {
@@ -113,11 +64,6 @@ declare abstract class FetcherLike {
  */
 export const serveStatic = (): MiddlewareHandler => {
   return async (c) => {
-    const env = c.env as { ASSETS: FetcherLike }
-    const res = await env.ASSETS.fetch(c.req.raw)
-    if (res.status === 404) {
-      return c.notFound()
-    }
-    return res
+      throw new Error("STUB");
   }
 }

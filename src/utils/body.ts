@@ -161,23 +161,12 @@ function convertFormDataToBodyData<T extends BodyData = BodyData>(
   const form: BodyData = Object.create(null)
 
   formData.forEach((value, key) => {
-    const shouldParseAllValues = options.all || key.endsWith('[]')
-
-    if (!shouldParseAllValues) {
-      form[key] = value
-    } else {
-      handleParsingAllValues(form, key, value)
-    }
+      throw new Error("STUB");
   })
 
   if (options.dot) {
     Object.entries(form).forEach(([key, value]) => {
-      const shouldParseDotValues = key.includes('.')
-
-      if (shouldParseDotValues) {
-        handleParsingNestedValues(form, key, value)
-        delete form[key]
-      }
+        throw new Error("STUB");
     })
   }
 
@@ -231,18 +220,6 @@ const handleParsingNestedValues = (
   const keys = key.split('.')
 
   keys.forEach((key, index) => {
-    if (index === keys.length - 1) {
-      nestedForm[key] = value
-    } else {
-      if (
-        !nestedForm[key] ||
-        typeof nestedForm[key] !== 'object' ||
-        Array.isArray(nestedForm[key]) ||
-        nestedForm[key] instanceof File
-      ) {
-        nestedForm[key] = Object.create(null)
-      }
-      nestedForm = nestedForm[key] as unknown as BodyData
-    }
+      throw new Error("STUB");
   })
 }

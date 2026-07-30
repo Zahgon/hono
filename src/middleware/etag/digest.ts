@@ -38,6 +38,6 @@ export const generateDigest = async (
   }
 
   return Array.prototype.map
-    .call(new Uint8Array(result), (x) => x.toString(16).padStart(2, '0'))
+    .call(new Uint8Array(result), (x) => { throw new Error("STUB"); })
     .join('')
 }

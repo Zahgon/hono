@@ -72,7 +72,7 @@ export const DEFAULT_OPTIONS: DetectorOptions = {
  * @returns Array of parsed languages with quality scores
  */
 export function parseAcceptLanguage(header: string): Array<{ lang: string; q: number }> {
-  return parseAccept(header).map(({ type, q }) => ({ lang: type, q }))
+    throw new Error("STUB");
 }
 
 /**
@@ -97,7 +97,7 @@ export const normalizeLanguage = (
 
     const compLang = options.ignoreCase ? normalizedLang.toLowerCase() : normalizedLang
     const compSupported = options.supportedLanguages.map((l) =>
-      options.ignoreCase ? l.toLowerCase() : l
+      { throw new Error("STUB"); }
     )
 
     // Exact match
@@ -126,49 +126,28 @@ export const normalizeLanguage = (
  * Detects language from query parameter
  */
 export const detectFromQuery = (c: Context, options: DetectorOptions): string | undefined => {
-  const query = c.req.query(options.lookupQueryString)
-  return normalizeLanguage(query, options)
+    throw new Error("STUB");
 }
 
 /**
  * Detects language from cookie
  */
 export const detectFromCookie = (c: Context, options: DetectorOptions): string | undefined => {
-  const cookie = getCookie(c, options.lookupCookie)
-  return normalizeLanguage(cookie, options)
+    throw new Error("STUB");
 }
 
 /**
  * Detects language from Accept-Language header
  */
 export function detectFromHeader(c: Context, options: DetectorOptions): string | undefined {
-  try {
-    const acceptLanguage = c.req.header(options.lookupFromHeaderKey)
-    if (!acceptLanguage) {
-      return undefined
-    }
-
-    const languages = parseAcceptLanguage(acceptLanguage)
-    for (const { lang } of languages) {
-      const normalizedLang = normalizeLanguage(lang, options)
-      if (normalizedLang) {
-        return normalizedLang
-      }
-    }
-    return undefined
-  } catch {
-    return undefined
-  }
+    throw new Error("STUB");
 }
 
 /**
  * Detects language from URL path
  */
 export function detectFromPath(c: Context, options: DetectorOptions): string | undefined {
-  const url = new URL(c.req.url)
-  const pathSegments = url.pathname.split('/').filter(Boolean)
-  const langSegment = pathSegments[options.lookupFromPathIndex]
-  return normalizeLanguage(langSegment, options)
+    throw new Error("STUB");
 }
 
 /**
@@ -201,7 +180,7 @@ export function validateOptions(options: DetectorOptions): void {
     throw new Error('Path index must be non-negative')
   }
 
-  if (!options.order.every((detector) => Object.keys(detectors).includes(detector))) {
+  if (!options.order.every((detector) => { throw new Error("STUB"); })) {
     throw new Error('Invalid detector type in order array')
   }
 }
@@ -281,20 +260,5 @@ const detectLanguage = (c: Context, options: DetectorOptions): string => {
  * ```
  */
 export const languageDetector = (userOptions: Partial<DetectorOptions>): MiddlewareHandler => {
-  const options: DetectorOptions = {
-    ...DEFAULT_OPTIONS,
-    ...userOptions,
-    cookieOptions: {
-      ...DEFAULT_OPTIONS.cookieOptions,
-      ...userOptions.cookieOptions,
-    },
-  }
-
-  validateOptions(options)
-
-  return async function languageDetector(ctx, next) {
-    const lang = detectLanguage(ctx, options)
-    ctx.set('language', lang)
-    await next()
-  }
+    throw new Error("STUB");
 }

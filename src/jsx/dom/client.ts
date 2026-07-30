@@ -47,10 +47,8 @@ export const createRoot = (
         renderNode(
           buildNode({
             tag: () => {
-              const [_jsxNode, _setJsxNode] = useState(jsxNode)
-              setJsxNode = _setJsxNode
-              return _jsxNode
-            },
+                  throw new Error("STUB");
+              },
             props: {},
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any) as NodeObject,
@@ -59,8 +57,7 @@ export const createRoot = (
       }
     },
     unmount() {
-      setJsxNode?.(null)
-      setJsxNode = null
+        throw new Error("STUB");
     },
   }
 }
@@ -78,9 +75,7 @@ export const hydrateRoot = (
   reactNode: Child,
   options: RootOptions = {}
 ): Root => {
-  const root = createRoot(element, options)
-  root.render(reactNode)
-  return root
+    throw new Error("STUB");
 }
 
 export default {

@@ -61,7 +61,7 @@ export const Suspense: FC<PropsWithChildren<{ fallback: any }>> = async ({
     stackNode[DOM_STASH][0] = 0
     buildDataStack.push([[], stackNode])
     resArray = children.map((c) =>
-      c == null || typeof c === 'boolean' ? '' : c.toString()
+      { throw new Error("STUB"); }
     ) as HtmlEscapedString[]
   } catch (e) {
     if (e instanceof Promise) {
@@ -70,11 +70,7 @@ export const Suspense: FC<PropsWithChildren<{ fallback: any }>> = async ({
       const resume = captureRenderContext()
       resArray = [
         e.then(() =>
-          resume(() => {
-            stackNode[DOM_STASH][0] = 0
-            buildDataStack.push([[], stackNode])
-            return childrenToString(children as Child[]).finally(popNodeStack)
-          })
+          { throw new Error("STUB"); }
         ),
       ] as Promise<HtmlEscapedString[]>[]
     } else {
@@ -84,51 +80,13 @@ export const Suspense: FC<PropsWithChildren<{ fallback: any }>> = async ({
     popNodeStack()
   }
 
-  if (resArray.some((res) => (res as {}) instanceof Promise)) {
+  if (resArray.some((res) => { throw new Error("STUB"); })) {
     const index = suspenseCounter++
     const fallbackStr = await fallback.toString()
     return raw(`<template id="H:${index}"></template>${fallbackStr}<!--/$-->`, [
       ...(fallbackStr.callbacks || []),
       ({ phase, buffer, context }) => {
-        if (phase === HtmlEscapedCallbackPhase.BeforeStream) {
-          return
-        }
-        return Promise.all(resArray).then(async (htmlArray) => {
-          htmlArray = htmlArray.flat()
-          const content = htmlArray.join('')
-          if (buffer) {
-            buffer[0] = buffer[0].replace(
-              new RegExp(`<template id="H:${index}"></template>.*?<!--/\\$-->`),
-              content
-            )
-          }
-          let html = buffer
-            ? ''
-            : `<template data-hono-target="H:${index}">${content}</template><script${
-                nonce ? ` nonce="${nonce}"` : ''
-              }>
-((d,c,n) => {
-c=d.currentScript.previousSibling
-d=d.getElementById('H:${index}')
-if(!d)return
-do{n=d.nextSibling;n.remove()}while(n.nodeType!=8||n.nodeValue!='/$')
-d.replaceWith(c.content)
-})(document)
-</script>`
-
-          const callbacks = htmlArray
-            .map((html) => (html as HtmlEscapedString).callbacks || [])
-            .flat()
-          if (!callbacks.length) {
-            return html
-          }
-
-          if (phase === HtmlEscapedCallbackPhase.Stream) {
-            html = await resolveCallback(html, HtmlEscapedCallbackPhase.BeforeStream, true, context)
-          }
-
-          return raw(html, callbacks)
-        })
+          throw new Error("STUB");
       },
     ])
   } else {
@@ -150,70 +108,10 @@ export const renderToReadableStream = (
   let cancelled = false
   const reader = new ReadableStream<Uint8Array>({
     async start(controller) {
-      try {
-        if (content instanceof JSXNode) {
-          // aJSXNode.toString() returns a string or Promise<string> and string is already escaped
-          content = content.toString() as HtmlEscapedString | Promise<HtmlEscapedString>
-        }
-        const context = typeof content === 'object' ? content : {}
-        const resolved = await resolveCallback(
-          content,
-          HtmlEscapedCallbackPhase.BeforeStream,
-          true,
-          context
-        )
-        if (!cancelled) {
-          controller.enqueue(textEncoder.encode(resolved))
-        }
-
-        let resolvedCount = 0
-        const callbacks: Promise<void>[] = []
-        const then = (promise: Promise<string>) => {
-          callbacks.push(
-            promise
-              .catch((err) => {
-                console.log(err)
-                onError(err)
-                return ''
-              })
-              .then(async (res) => {
-                res = await resolveCallback(
-                  res,
-                  HtmlEscapedCallbackPhase.BeforeStream,
-                  true,
-                  context
-                )
-                ;(res as HtmlEscapedString).callbacks
-                  ?.map((c) => c({ phase: HtmlEscapedCallbackPhase.Stream, context }))
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  .filter<Promise<string>>(Boolean as any)
-                  .forEach(then)
-                resolvedCount++
-                if (!cancelled) {
-                  controller.enqueue(textEncoder.encode(res))
-                }
-              })
-          )
-        }
-        ;(resolved as HtmlEscapedString).callbacks
-          ?.map((c) => c({ phase: HtmlEscapedCallbackPhase.Stream, context }))
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .filter<Promise<string>>(Boolean as any)
-          .forEach(then)
-        while (resolvedCount !== callbacks.length) {
-          await Promise.all(callbacks)
-        }
-      } catch (e) {
-        // maybe the connection was closed
-        onError(e)
-      }
-
-      if (!cancelled) {
-        controller.close()
-      }
-    },
+          throw new Error("STUB");
+      },
     cancel() {
-      cancelled = true
+        throw new Error("STUB");
     },
   })
   return reader

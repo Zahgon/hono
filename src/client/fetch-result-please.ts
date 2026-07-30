@@ -12,35 +12,7 @@ const nullBodyResponses = new Set([101, 204, 205, 304])
  * Throwing a structured error if the response is not `ok`. ({@link DetailedError})
  */
 export async function fetchRP(fetchRes: Response | Promise<Response>): Promise<any> {
-  const _fetchRes = (await fetchRes) as unknown as Response & {
-    _data: any
-    /**
-     * @description BodyInit property from whatwg-fetch polyfill
-     *
-     * @link https://github.com/JakeChampion/fetch/blob/main/fetch.js#L238
-     */
-    _bodyInit?: any
-  }
-
-  const hasBody =
-    (_fetchRes.body || _fetchRes._bodyInit) && !nullBodyResponses.has(_fetchRes.status)
-
-  if (hasBody) {
-    const responseType = detectResponseType(_fetchRes)
-    _fetchRes._data = await _fetchRes[responseType]()
-  }
-
-  if (!_fetchRes.ok) {
-    throw new DetailedError(`${_fetchRes.status} ${_fetchRes.statusText}`, {
-      statusCode: _fetchRes?.status,
-      detail: {
-        data: _fetchRes?._data,
-        statusText: _fetchRes?.statusText,
-      },
-    })
-  }
-
-  return _fetchRes._data
+    throw new Error("STUB");
 }
 
 export class DetailedError extends Error {
@@ -78,18 +50,5 @@ export class DetailedError extends Error {
 const jsonRegex = /^application\/(?:[\w!#$%&*.^`~-]*\+)?json(?:;.+)?$/i
 
 function detectResponseType(response: Response): 'json' | 'text' {
-  const _contentType = response.headers.get('content-type')
-
-  if (!_contentType) {
-    return 'text'
-  }
-
-  // `_contentType` might look like: `application/json; charset=utf-8`, `text/plain`, so we get the first part before `;`
-  const contentType = _contentType.split(';').shift()!
-
-  if (jsonRegex.test(contentType)) {
-    return 'json'
-  }
-
-  return 'text'
+    throw new Error("STUB");
 }

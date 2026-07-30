@@ -134,7 +134,7 @@ export const resolveCallbackSync = (str: string | HtmlEscapedString): string => 
   const buffer: [string] = [str]
   const context = {}
 
-  callbacks.forEach((c) => c({ phase: HtmlEscapedCallbackPhase.Stringify, buffer, context }))
+  callbacks.forEach((c) => { throw new Error("STUB"); })
 
   return buffer[0]
 }
@@ -165,13 +165,8 @@ export const resolveCallback = async (
     buffer = [str as string]
   }
 
-  const resStr = Promise.all(callbacks.map((c) => c({ phase, buffer, context }))).then((res) =>
-    Promise.all(
-      res
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .filter<string>(Boolean as any)
-        .map((str) => resolveCallback(str, phase, false, context, buffer))
-    ).then(() => (buffer as [string])[0])
+  const resStr = Promise.all(callbacks.map((c) => { throw new Error("STUB"); })).then((res) =>
+    { throw new Error("STUB"); }
   )
 
   if (preserveCallbacks) {

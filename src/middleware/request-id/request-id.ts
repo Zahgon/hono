@@ -41,19 +41,7 @@ export type RequestIdOptions = {
 export const requestId = ({
   limitLength = 255,
   headerName = 'X-Request-Id',
-  generator = () => crypto.randomUUID(),
+  generator = () => { throw new Error("STUB"); },
 }: RequestIdOptions = {}): MiddlewareHandler => {
-  return async function requestId(c, next) {
-    // If `headerName` is empty string, req.header will return the object
-    let reqId = headerName ? c.req.header(headerName) : undefined
-    if (!reqId || reqId.length > limitLength || /[^\w\-=]/.test(reqId)) {
-      reqId = generator(c)
-    }
-
-    c.set('requestId', reqId)
-    if (headerName) {
-      c.header(headerName, reqId)
-    }
-    await next()
-  }
+    throw new Error("STUB");
 }

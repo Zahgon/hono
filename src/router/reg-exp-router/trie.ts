@@ -14,11 +14,7 @@ export class Trie {
     for (let i = 0; ; ) {
       let replaced = false
       path = path.replace(/\{[^}]+\}/g, (m) => {
-        const mark = `@\\${i}`
-        groups[i] = [mark, m]
-        i++
-        replaced = true
-        return mark
+          throw new Error("STUB");
       })
       if (!replaced) {
         break
@@ -47,28 +43,6 @@ export class Trie {
   }
 
   buildRegExp(): [RegExp, ReplacementMap, ReplacementMap] {
-    let regexp = this.#root.buildRegExpStr()
-    if (regexp === '') {
-      return [/^$/, [], []] // never match
-    }
-
-    let captureIndex = 0
-    const indexReplacementMap: ReplacementMap = []
-    const paramReplacementMap: ReplacementMap = []
-
-    regexp = regexp.replace(/#(\d+)|@(\d+)|\.\*\$/g, (_, handlerIndex, paramIndex) => {
-      if (handlerIndex !== undefined) {
-        indexReplacementMap[++captureIndex] = Number(handlerIndex)
-        return '$()'
-      }
-      if (paramIndex !== undefined) {
-        paramReplacementMap[Number(paramIndex)] = ++captureIndex
-        return ''
-      }
-
-      return ''
-    })
-
-    return [new RegExp(`^${regexp}`), indexReplacementMap, paramReplacementMap]
+      throw new Error("STUB");
   }
 }

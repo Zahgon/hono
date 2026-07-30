@@ -42,35 +42,7 @@ type TrimTrailingSlashOptions = {
  * ```
  */
 export const trimTrailingSlash = (options?: TrimTrailingSlashOptions): MiddlewareHandler => {
-  return async function trimTrailingSlash(c, next) {
-    if (options?.alwaysRedirect) {
-      if (
-        (c.req.method === 'GET' || c.req.method === 'HEAD') &&
-        c.req.path !== '/' &&
-        c.req.path.at(-1) === '/'
-      ) {
-        const url = new URL(c.req.url)
-        url.pathname = url.pathname.substring(0, url.pathname.length - 1)
-
-        return c.redirect(url.toString(), 301)
-      }
-    }
-
-    await next()
-
-    if (
-      !options?.alwaysRedirect &&
-      c.res.status === 404 &&
-      (c.req.method === 'GET' || c.req.method === 'HEAD') &&
-      c.req.path !== '/' &&
-      c.req.path.at(-1) === '/'
-    ) {
-      const url = new URL(c.req.url)
-      url.pathname = url.pathname.substring(0, url.pathname.length - 1)
-
-      c.res = c.redirect(url.toString(), 301)
-    }
-  }
+    throw new Error("STUB");
 }
 
 type AppendTrailingSlashOptions = {
@@ -126,33 +98,5 @@ type AppendTrailingSlashOptions = {
  * ```
  */
 export const appendTrailingSlash = (options?: AppendTrailingSlashOptions): MiddlewareHandler => {
-  return async function appendTrailingSlash(c, next) {
-    if (options?.alwaysRedirect) {
-      if (
-        (c.req.method === 'GET' || c.req.method === 'HEAD') &&
-        c.req.path.at(-1) !== '/' &&
-        !options.skip?.(c.req.path)
-      ) {
-        const url = new URL(c.req.url)
-        url.pathname += '/'
-
-        return c.redirect(url.toString(), 301)
-      }
-    }
-
-    await next()
-
-    if (
-      !options?.alwaysRedirect &&
-      c.res.status === 404 &&
-      (c.req.method === 'GET' || c.req.method === 'HEAD') &&
-      c.req.path.at(-1) !== '/' &&
-      !options?.skip?.(c.req.path)
-    ) {
-      const url = new URL(c.req.url)
-      url.pathname += '/'
-
-      c.res = c.redirect(url.toString(), 301)
-    }
-  }
+    throw new Error("STUB");
 }

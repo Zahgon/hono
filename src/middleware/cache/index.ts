@@ -20,7 +20,7 @@ const parseVaryDirectives = (vary: string | string[] | null | undefined): string
     return []
   }
   return (Array.isArray(vary) ? vary : vary.split(','))
-    .map((directive) => directive.trim().toLowerCase())
+    .map((directive) => { throw new Error("STUB"); })
     .filter(Boolean)
 }
 
@@ -30,7 +30,7 @@ const shouldSkipCache = (
   responseVary: string[]
 ): boolean =>
   (responseVary.length &&
-    (!optionsVaryDirectives || responseVary.some((name) => !optionsVaryDirectives.has(name)))) ||
+    (!optionsVaryDirectives || responseVary.some((name) => { throw new Error("STUB"); }))) ||
   shouldSkipCacheControl(res.headers.get('Cache-Control')) ||
   res.headers.has('Set-Cookie')
 
@@ -70,115 +70,5 @@ export const cache = (options: {
   cacheableStatusCodes?: StatusCode[]
   onCacheNotAvailable?: (() => void) | false
 }): MiddlewareHandler => {
-  if (!globalThis.caches) {
-    if (options.onCacheNotAvailable === false) {
-      // suppress log
-    } else if (options.onCacheNotAvailable) {
-      options.onCacheNotAvailable()
-    } else {
-      console.log('Cache Middleware is not enabled because caches is not defined.')
-    }
-    return async (_c, next) => await next()
-  }
-
-  if (options.wait === undefined) {
-    options.wait = false
-  }
-
-  const cacheControlDirectives = options.cacheControl
-    ?.split(',')
-    .map((directive) => directive.toLowerCase())
-  const optionsVaryList = parseVaryDirectives(options.vary)
-  const varyDirectives = optionsVaryList.length ? new Set(optionsVaryList) : undefined
-  // RFC 7231 Section 7.1.4 specifies that "*" is not allowed in Vary header.
-  // See: https://datatracker.ietf.org/doc/html/rfc7231#section-7.1.4
-  if (varyDirectives?.has('*')) {
-    throw new Error(
-      'Middleware vary configuration cannot include "*", as it disallows effective caching.'
-    )
-  }
-
-  const cacheableStatusCodes = new Set<number>(
-    options.cacheableStatusCodes ?? defaultCacheableStatusCodes
-  )
-
-  const addHeader = (c: Context, responseVary: string[]) => {
-    if (cacheControlDirectives) {
-      const existingDirectives =
-        c.res.headers
-          .get('Cache-Control')
-          ?.split(',')
-          // Directive names are case-insensitive (RFC 7234 §5.2); lower-case so
-          // the case-insensitive de-dup check below matches handler-set names
-          // like `Max-Age`.
-          .map((d) => d.trim().split('=', 1)[0].toLowerCase()) ?? []
-      for (const directive of cacheControlDirectives) {
-        let [name, value] = directive.trim().split('=', 2)
-        name = name.toLowerCase()
-        if (!existingDirectives.includes(name)) {
-          c.header('Cache-Control', `${name}${value ? `=${value}` : ''}`, { append: true })
-        }
-      }
-    }
-
-    if (varyDirectives) {
-      if (responseVary.length === 0) {
-        c.header('Vary', Array.from(varyDirectives).join(', '))
-      } else {
-        const merged = new Set(varyDirectives)
-        for (const directive of responseVary) {
-          merged.add(directive)
-        }
-        if (merged.has('*')) {
-          c.header('Vary', '*')
-        } else {
-          c.header('Vary', Array.from(merged).join(', '))
-        }
-      }
-    }
-  }
-
-  return async function cache(c, next) {
-    if (c.req.method !== 'GET' || c.req.raw.headers.has('Authorization')) {
-      await next()
-      return
-    }
-
-    let key = c.req.url
-    if (options.keyGenerator) {
-      key = await options.keyGenerator(c)
-    }
-    if (varyDirectives) {
-      for (const directive of varyDirectives) {
-        const value = c.req.raw.headers.get(directive) ?? ''
-        key += `::${directive}=${encodeURIComponent(value)}`
-      }
-    }
-
-    const cacheName =
-      typeof options.cacheName === 'function' ? await options.cacheName(c) : options.cacheName
-    const cache = await caches.open(cacheName)
-    const response = await cache.match(key)
-    if (response) {
-      return new Response(response.body, response)
-    }
-
-    await next()
-    if (!cacheableStatusCodes.has(c.res.status)) {
-      return
-    }
-    const responseVary = parseVaryDirectives(c.res.headers.get('Vary'))
-    addHeader(c, responseVary)
-
-    if (shouldSkipCache(c.res, varyDirectives, responseVary)) {
-      return
-    }
-
-    const res = c.res.clone()
-    if (options.wait) {
-      await cache.put(key, res)
-    } else {
-      c.executionCtx.waitUntil(cache.put(key, res))
-    }
-  }
+    throw new Error("STUB");
 }

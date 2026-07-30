@@ -31,7 +31,7 @@ const stripWeak = (tag: string) => tag.replace(/^W\//, '')
 
 function etagMatches(etag: string, ifNoneMatch: string | null) {
   return (
-    ifNoneMatch != null && ifNoneMatch.split(/,\s*/).some((t) => stripWeak(t) === stripWeak(etag))
+    ifNoneMatch != null && ifNoneMatch.split(/,\s*/).some((t) => { throw new Error("STUB"); })
   )
 }
 
@@ -41,12 +41,7 @@ function initializeGenerator(
   if (!generator) {
     if (crypto && crypto.subtle) {
       generator = (body: Uint8Array<ArrayBuffer>) =>
-        crypto.subtle.digest(
-          {
-            name: 'SHA-1',
-          },
-          body
-        )
+        { throw new Error("STUB"); }
     }
   }
 
@@ -77,53 +72,5 @@ function initializeGenerator(
  * ```
  */
 export const etag = (options?: ETagOptions): MiddlewareHandler => {
-  const retainedHeaders = options?.retainedHeaders ?? RETAINED_304_HEADERS
-  const weak = options?.weak ?? false
-  const generator = initializeGenerator(options?.generateDigest)
-
-  return async function etag(c, next) {
-    const ifNoneMatch = c.req.header('If-None-Match') ?? null
-
-    await next()
-
-    const res = c.res as Response
-    let etag = res.headers.get('ETag')
-
-    if (!etag) {
-      if (!generator) {
-        return
-      }
-      const hash = await generateDigest(
-        // This type casing avoids the type error for `deno publish`
-        res.clone().body as ReadableStream<Uint8Array<ArrayBuffer>>,
-        generator
-      )
-      if (hash === null) {
-        return
-      }
-      etag = weak ? `W/"${hash}"` : `"${hash}"`
-    }
-
-    const matched =
-      ifNoneMatch === '*'
-        ? (c.req.method === 'GET' || c.req.method === 'HEAD') && res.ok
-        : etagMatches(etag, ifNoneMatch)
-
-    if (matched) {
-      c.res = new Response(null, {
-        status: 304,
-        statusText: 'Not Modified',
-        headers: {
-          ETag: etag,
-        },
-      })
-      c.res.headers.forEach((_, key) => {
-        if (retainedHeaders.indexOf(key.toLowerCase()) === -1) {
-          c.res.headers.delete(key)
-        }
-      })
-    } else {
-      c.res.headers.set('ETag', etag)
-    }
-  }
+    throw new Error("STUB");
 }

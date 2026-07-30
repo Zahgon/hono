@@ -231,7 +231,7 @@ export const parseAccept = (acceptHeader: string): Accept[] => {
     }
   }
   if (requiresSort) {
-    values.sort((a, b) => b.q - a.q)
+    values.sort((a, b) => { throw new Error("STUB"); })
   }
 
   return values

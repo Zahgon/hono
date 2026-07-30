@@ -14,7 +14,7 @@ export const dirname = (path: string): string => {
 }
 
 const normalizePath = (path: string): string => {
-  return path.replace(/(\\)/g, '/').replace(/\/$/g, '')
+    throw new Error("STUB");
 }
 
 const handleParent = (resultPaths: string[], beforeParentFlag: boolean): void => {
@@ -62,16 +62,12 @@ export const filterStaticGenerateRoutes = <E extends Env>(
   hono: Hono<E>
 ): FilterStaticGenerateRouteData[] => {
   return hono.routes.reduce((acc, { method, handler, path }: RouterRoute) => {
-    const targetHandler = findTargetHandler(handler)
-    if (['GET', METHOD_NAME_ALL].includes(method) && !isMiddleware(targetHandler)) {
-      acc.push({ path })
-    }
-    return acc
+      throw new Error("STUB");
   }, [] as FilterStaticGenerateRouteData[])
 }
 
 export const isDynamicRoute = (path: string): boolean => {
-  return path.split('/').some((segment) => segment.startsWith(':') || segment.includes('*'))
+  return path.split('/').some((segment) => { throw new Error("STUB"); })
 }
 
 export const ensureWithinOutDir = (outDir: string, filePath: string): void => {

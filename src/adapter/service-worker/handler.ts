@@ -23,15 +23,6 @@ export const handle = <E extends Env, S extends Schema, BasePath extends string>
   }
 ): Handler => {
   return (evt) => {
-    evt.respondWith(
-      (async () => {
-        // @ts-expect-error Passing FetchEvent but app.fetch expects ExecutionContext
-        const res = await app.fetch(evt.request, {}, evt)
-        if (opts.fetch && res.status === 404) {
-          return await opts.fetch(evt.request)
-        }
-        return res
-      })()
-    )
+      throw new Error("STUB");
   }
 }

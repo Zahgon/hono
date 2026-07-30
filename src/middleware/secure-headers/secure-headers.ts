@@ -135,13 +135,7 @@ const generateNonce = () => {
 }
 
 export const NONCE: ContentSecurityPolicyOptionHandler = (ctx) => {
-  const key = 'secureHeadersNonce'
-  const init = ctx.get(key)
-  const nonce = init || generateNonce()
-  if (init == null) {
-    ctx.set(key, nonce)
-  }
-  return `'nonce-${nonce}'`
+    throw new Error("STUB");
 }
 
 /**
@@ -177,69 +171,14 @@ export const NONCE: ContentSecurityPolicyOptionHandler = (ctx) => {
  * ```
  */
 export const secureHeaders = (customOptions?: SecureHeadersOptions): MiddlewareHandler => {
-  const options = { ...DEFAULT_OPTIONS, ...customOptions }
-  const headersToSet = getFilteredHeaders(options)
-  const callbacks: SecureHeadersCallback[] = []
-
-  if (options.contentSecurityPolicy) {
-    const [callback, value] = getCSPDirectives(
-      options.contentSecurityPolicy,
-      'Content-Security-Policy'
-    )
-    if (callback) {
-      callbacks.push(callback)
-    }
-    headersToSet.push(['Content-Security-Policy', value as string])
-  }
-
-  if (options.contentSecurityPolicyReportOnly) {
-    const [callback, value] = getCSPDirectives(
-      options.contentSecurityPolicyReportOnly,
-      'Content-Security-Policy-Report-Only'
-    )
-    if (callback) {
-      callbacks.push(callback)
-    }
-    headersToSet.push(['Content-Security-Policy-Report-Only', value as string])
-  }
-
-  if (options.permissionsPolicy && Object.keys(options.permissionsPolicy).length > 0) {
-    headersToSet.push([
-      'Permissions-Policy',
-      getPermissionsPolicyDirectives(options.permissionsPolicy),
-    ])
-  }
-
-  if (options.reportingEndpoints) {
-    headersToSet.push(['Reporting-Endpoints', getReportingEndpoints(options.reportingEndpoints)])
-  }
-
-  if (options.reportTo) {
-    headersToSet.push(['Report-To', getReportToOptions(options.reportTo)])
-  }
-
-  return async function secureHeaders(ctx, next) {
-    // should evaluate callbacks before next()
-    // some callback calls ctx.set() for embedding nonce to the page
-    const headersToSetForReq =
-      callbacks.length === 0
-        ? headersToSet
-        : callbacks.reduce((acc, cb) => cb(ctx, acc), headersToSet)
-    await next()
-    setHeaders(ctx, headersToSetForReq)
-
-    if (options?.removePoweredBy) {
-      ctx.res.headers.delete('X-Powered-By')
-    }
-  }
+    throw new Error("STUB");
 }
 
 function getFilteredHeaders(options: SecureHeadersOptions): [string, string][] {
   return Object.entries(HEADERS_MAP)
-    .filter(([key]) => options[key as keyof SecureHeadersOptions])
+    .filter(([key]) => { throw new Error("STUB"); })
     .map(([key, defaultValue]) => {
-      const overrideValue = options[key as keyof SecureHeadersOptions]
-      return typeof overrideValue === 'string' ? [defaultValue[0], overrideValue] : defaultValue
+        throw new Error("STUB");
     })
 }
 
@@ -254,19 +193,14 @@ function getCSPDirectives(
     const valueArray = Array.isArray(value) ? value : [value]
 
     valueArray.forEach((value, i) => {
-      if (typeof value === 'function') {
-        const index = i * 2 + 2 + resultValues.length
-        callbacks.push((ctx, values) => {
-          values[index] = value(ctx, directive)
-        })
-      }
+        throw new Error("STUB");
     })
 
     resultValues.push(
       directive.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (match, offset) =>
-        offset ? '-' + match.toLowerCase() : match.toLowerCase()
+        { throw new Error("STUB"); }
       ),
-      ...valueArray.flatMap((value) => [' ', value]),
+      ...valueArray.flatMap((value) => { throw new Error("STUB"); }),
       '; '
     )
   }
@@ -276,17 +210,7 @@ function getCSPDirectives(
     ? [undefined, resultValues.join('')]
     : [
         (ctx, headersToSet) =>
-          headersToSet.map((values) => {
-            if (values[0] === headerName) {
-              const clone = values[1].slice() as unknown as string[]
-              callbacks.forEach((cb) => {
-                cb(ctx, clone)
-              })
-              return [values[0], clone.join('')]
-            } else {
-              return values as [string, string]
-            }
-          }),
+          { throw new Error("STUB"); },
         resultValues,
       ]
 }
@@ -294,24 +218,7 @@ function getCSPDirectives(
 function getPermissionsPolicyDirectives(policy: PermissionsPolicyOptions): string {
   return Object.entries(policy)
     .map(([directive, value]) => {
-      const kebabDirective = camelToKebab(directive)
-
-      if (typeof value === 'boolean') {
-        return `${kebabDirective}=${value ? '*' : 'none'}`
-      }
-
-      if (Array.isArray(value)) {
-        if (value.length === 0) {
-          return `${kebabDirective}=()`
-        }
-        if (value.length === 1 && (value[0] === '*' || value[0] === 'none')) {
-          return `${kebabDirective}=${value[0]}`
-        }
-        const allowlist = value.map((item) => (['self', 'src'].includes(item) ? item : `"${item}"`))
-        return `${kebabDirective}=(${allowlist.join(' ')})`
-      }
-
-      return ''
+        throw new Error("STUB");
     })
     .filter(Boolean)
     .join(', ')
@@ -324,15 +231,15 @@ function camelToKebab(str: string): string {
 function getReportingEndpoints(
   reportingEndpoints: SecureHeadersOptions['reportingEndpoints'] = []
 ): string {
-  return reportingEndpoints.map((endpoint) => `${endpoint.name}="${endpoint.url}"`).join(', ')
+  return reportingEndpoints.map((endpoint) => { throw new Error("STUB"); }).join(', ')
 }
 
 function getReportToOptions(reportTo: SecureHeadersOptions['reportTo'] = []): string {
-  return reportTo.map((option) => JSON.stringify(option)).join(', ')
+  return reportTo.map((option) => { throw new Error("STUB"); }).join(', ')
 }
 
 function setHeaders(ctx: Context, headersToSet: [string, string][]) {
   headersToSet.forEach(([header, value]) => {
-    ctx.res.headers.set(header, value)
+      throw new Error("STUB");
   })
 }

@@ -6,24 +6,7 @@
 import { sha256 } from './crypto'
 
 export const equal = (a: ArrayBuffer, b: ArrayBuffer): boolean => {
-  if (a === b) {
-    return true
-  }
-  if (a.byteLength !== b.byteLength) {
-    return false
-  }
-
-  const va = new DataView(a)
-  const vb = new DataView(b)
-
-  let i = va.byteLength
-  while (i--) {
-    if (va.getUint8(i) !== vb.getUint8(i)) {
-      return false
-    }
-  }
-
-  return true
+    throw new Error("STUB");
 }
 
 const constantTimeEqualString = (a: string, b: string): boolean => {
@@ -96,11 +79,7 @@ export const timingSafeEqual: TimingSafeEqual = async (
 }
 
 export const bufferToString = (buffer: ArrayBuffer): string => {
-  if (buffer instanceof ArrayBuffer) {
-    const enc = new TextDecoder('utf-8')
-    return enc.decode(buffer)
-  }
-  return buffer
+    throw new Error("STUB");
 }
 
 export const bufferToFormData = (
@@ -110,7 +89,7 @@ export const bufferToFormData = (
   const response = new Response(arrayBuffer, {
     headers: {
       // Normalize the media type (case-insensitive) while keeping parameters like the boundary
-      'Content-Type': contentType.replace(/^[^;]+/, (mediaType) => mediaType.toLowerCase()),
+      'Content-Type': contentType.replace(/^[^;]+/, (mediaType) => { throw new Error("STUB"); }),
     },
   })
   return response.formData()

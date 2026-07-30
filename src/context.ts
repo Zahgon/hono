@@ -279,16 +279,13 @@ type ResponseOrInit<T extends StatusCode = StatusCode> = ResponseInit<T> | Respo
 export const TEXT_PLAIN = 'text/plain; charset=UTF-8'
 
 const setDefaultContentType = (contentType: string, headers?: HeaderRecord): HeaderRecord => {
-  return {
-    'Content-Type': contentType,
-    ...headers,
-  }
+    throw new Error("STUB");
 }
 
 const createResponseInstance = (
   body?: BodyInit | null | undefined,
   init?: globalThis.ResponseInit
-): Response => new Response(body, init)
+): Response => { throw new Error("STUB"); }
 
 export class Context<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -350,22 +347,14 @@ export class Context<
    * @param options - Optional configuration options for the context.
    */
   constructor(req: Request, options?: ContextOptions<E>) {
-    this.#rawRequest = req
-    if (options) {
-      this.#executionCtx = options.executionCtx
-      this.env = options.env
-      this.#notFoundHandler = options.notFoundHandler
-      this.#path = options.path
-      this.#matchResult = options.matchResult
-    }
+      throw new Error("STUB");
   }
 
   /**
    * `.req` is the instance of {@link HonoRequest}.
    */
   get req(): HonoRequest<P, I['out']> {
-    this.#req ??= new HonoRequest(this.#rawRequest, this.#path, this.#matchResult)
-    return this.#req
+      throw new Error("STUB");
   }
 
   /**
@@ -375,11 +364,7 @@ export class Context<
    * @throws Will throw an error if the context does not have a FetchEvent.
    */
   get event(): FetchEventLike {
-    if (this.#executionCtx && 'respondWith' in this.#executionCtx) {
-      return this.#executionCtx
-    } else {
-      throw Error('This context has no FetchEvent')
-    }
+      throw new Error("STUB");
   }
 
   /**
@@ -389,11 +374,7 @@ export class Context<
    * @throws Will throw an error if the context does not have an ExecutionContext.
    */
   get executionCtx(): ExecutionContext {
-    if (this.#executionCtx) {
-      return this.#executionCtx as ExecutionContext
-    } else {
-      throw Error('This context has no ExecutionContext')
-    }
+      throw new Error("STUB");
   }
 
   /**
@@ -401,9 +382,7 @@ export class Context<
    * The Response object for the current request.
    */
   get res(): Response {
-    return (this.#res ||= createResponseInstance(null, {
-      headers: (this.#preparedHeaders ??= new Headers()),
-    }))
+      throw new Error("STUB");
   }
 
   /**
@@ -412,25 +391,7 @@ export class Context<
    * @param _res - The Response object to set.
    */
   set res(_res: Response | undefined) {
-    if (this.#res && _res) {
-      _res = createResponseInstance(_res.body, _res)
-      for (const [k, v] of this.#res.headers.entries()) {
-        if (k === 'content-type') {
-          continue
-        }
-        if (k === 'set-cookie') {
-          const cookies = this.#res.headers.getSetCookie()
-          _res.headers.delete('set-cookie')
-          for (const cookie of cookies) {
-            _res.headers.append('set-cookie', cookie)
-          }
-        } else {
-          _res.headers.set(k, v)
-        }
-      }
-    }
-    this.#res = _res
-    this.finalized = true
+      throw new Error("STUB");
   }
 
   /**
@@ -446,7 +407,7 @@ export class Context<
    * ```
    */
   render: Renderer = (...args) => {
-    this.#renderer ??= (content: string | Promise<string>) => this.html(content)
+    this.#renderer ??= (content: string | Promise<string>) => { throw new Error("STUB"); }
     return this.#renderer(...args)
   }
 
@@ -527,7 +488,7 @@ export class Context<
   }
 
   status = (status: StatusCode): void => {
-    this.#status = status
+      throw new Error("STUB");
   }
 
   /**
@@ -594,11 +555,7 @@ export class Context<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ContextVariableMap & (IsAny<E['Variables']> extends true ? Record<string, any> : E['Variables'])
   > {
-    if (!this.#var) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return {} as any
-    }
-    return Object.fromEntries(this.#var)
+      throw new Error("STUB");
   }
 
   #newResponse(
@@ -606,36 +563,7 @@ export class Context<
     arg?: StatusCode | ResponseOrInit,
     headers?: HeaderRecord
   ): Response {
-    const responseHeaders = this.#res
-      ? new Headers(this.#res.headers)
-      : (this.#preparedHeaders ?? new Headers())
-
-    if (typeof arg === 'object' && 'headers' in arg) {
-      const argHeaders = arg.headers instanceof Headers ? arg.headers : new Headers(arg.headers)
-      for (const [key, value] of argHeaders) {
-        if (key.toLowerCase() === 'set-cookie') {
-          responseHeaders.append(key, value)
-        } else {
-          responseHeaders.set(key, value)
-        }
-      }
-    }
-
-    if (headers) {
-      for (const [k, v] of Object.entries(headers)) {
-        if (typeof v === 'string') {
-          responseHeaders.set(k, v)
-        } else {
-          responseHeaders.delete(k)
-          for (const v2 of v) {
-            responseHeaders.append(k, v2)
-          }
-        }
-      }
-    }
-
-    const status = typeof arg === 'number' ? arg : (arg?.status ?? this.#status)
-    return createResponseInstance(data, { status, headers: responseHeaders })
+      throw new Error("STUB");
   }
 
   newResponse: NewResponse = (...args) => this.#newResponse(...(args as Parameters<NewResponse>))
@@ -726,7 +654,7 @@ export class Context<
     headers?: HeaderRecord
   ): Response | Promise<Response> => {
     const res = (html: string) =>
-      this.#newResponse(html, arg, setDefaultContentType('text/html; charset=UTF-8', headers))
+      { throw new Error("STUB"); }
     return typeof html === 'object'
       ? resolveCallback(html, HtmlEscapedCallbackPhase.Stringify, false, {}).then(res)
       : res(html)
@@ -774,7 +702,7 @@ export class Context<
    * ```
    */
   notFound = (): ReturnType<NotFoundHandler> => {
-    this.#notFoundHandler ??= () => createResponseInstance()
+    this.#notFoundHandler ??= () => { throw new Error("STUB"); }
     return this.#notFoundHandler(this)
   }
 }

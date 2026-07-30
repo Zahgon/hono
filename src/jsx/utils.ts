@@ -30,20 +30,7 @@ const cacheValidName = (cache: Set<unknown>, max: number, name: string): void =>
 }
 
 export const isValidTagName = (name: unknown): name is string => {
-  if (validTagNameCache.has(name)) {
-    return true
-  }
-  if (typeof name !== 'string') {
-    return false
-  }
-  if (name.length === 0) {
-    return true
-  }
-  if (invalidTagNameCharRe.test(name)) {
-    return false
-  }
-  cacheValidName(validTagNameCache, validTagNameCacheMax, name)
-  return true
+    throw new Error("STUB");
 }
 
 export const isValidAttributeName = (name: string): boolean => {
@@ -174,7 +161,7 @@ export const styleObjectForEach = (
     const key =
       k[0] === '-' || !/[A-Z]/.test(k)
         ? k // a CSS variable or a lowercase only property
-        : k.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`) // a camelCase property. convert to kebab-case
+        : k.replace(/[A-Z]/g, (m) => { throw new Error("STUB"); }) // a camelCase property. convert to kebab-case
     if (!isValidStylePropertyName(key)) {
       continue
     }

@@ -134,12 +134,9 @@ export const setSignedCookie = async (
   secret: string | BufferSource,
   opt?: CookieOptions
 ): Promise<void> => {
-  const cookie = await generateSignedCookie(name, value, secret, opt)
-  c.header('set-cookie', cookie, { append: true })
+    throw new Error("STUB");
 }
 
 export const deleteCookie = (c: Context, name: string, opt?: CookieOptions): string | undefined => {
-  const deletedCookie = getCookie(c, name, opt?.prefix)
-  setCookie(c, name, '', { ...opt, maxAge: 0 })
-  return deletedCookie
+    throw new Error("STUB");
 }

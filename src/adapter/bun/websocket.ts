@@ -33,8 +33,8 @@ export interface BunWebSocketData {
 export const createWSContext = (ws: BunServerWebSocket<BunWebSocketData>): WSContext => {
   return new WSContext({
     send: (source, options) => {
-      ws.send(source, options?.compress)
-    },
+          throw new Error("STUB");
+      },
     raw: ws,
     readyState: ws.readyState,
     url: ws.data.url,
@@ -46,31 +46,7 @@ export const createWSContext = (ws: BunServerWebSocket<BunWebSocketData>): WSCon
 }
 
 export const upgradeWebSocket: UpgradeWebSocket<any> = defineWebSocketHelper((c, events) => {
-  const server = getBunServer<{
-    upgrade<T>(
-      req: Request,
-      options?: {
-        data: T
-      }
-    ): boolean
-  }>(c)
-
-  if (!server) {
-    throw new TypeError('env has to include the 2nd argument of fetch.')
-  }
-  const upgradeResult = server.upgrade<BunWebSocketData>(c.req.raw, {
-    data: {
-      events,
-      url: new URL(c.req.url),
-      // The first requested subprotocol, exposed via WSContext.protocol to
-      // match the deno and cloudflare adapters.
-      protocol: c.req.header('sec-websocket-protocol')?.split(',')[0]?.trim() ?? '',
-    },
-  })
-  if (upgradeResult) {
-    return new Response(null)
-  }
-  return // failed
+    throw new Error("STUB");
 })
 
 export const websocket: BunWebSocketHandler<BunWebSocketData> = {
@@ -93,13 +69,7 @@ export const websocket: BunWebSocketHandler<BunWebSocketData> = {
     }
   },
   message(ws, message) {
-    const websocketListeners = ws.data.events
-    if (websocketListeners.onMessage) {
-      const normalizedReceiveData: WSMessageReceive =
-        typeof message === 'string' ? message : message.buffer
-
-      websocketListeners.onMessage(createWSMessageEvent(normalizedReceiveData), createWSContext(ws))
-    }
+      throw new Error("STUB");
   },
 }
 
@@ -107,7 +77,4 @@ export const websocket: BunWebSocketHandler<BunWebSocketData> = {
  * @deprecated Import `upgradeWebSocket` and `websocket` directly from `hono/bun` instead.
  * @returns A function to create a Bun WebSocket handler.
  */
-export const createBunWebSocket = <T>(): CreateWebSocket<T> => ({
-  upgradeWebSocket,
-  websocket,
-})
+export const createBunWebSocket = <T>(): CreateWebSocket<T> => { throw new Error("STUB"); }

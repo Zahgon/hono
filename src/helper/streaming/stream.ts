@@ -15,30 +15,14 @@ export const stream = (
   // Until Bun v1.1.27, Bun didn't call cancel() on the ReadableStream for Response objects from Bun.serve()
   if (isOldBunVersion()) {
     c.req.raw.signal.addEventListener('abort', () => {
-      if (!stream.closed) {
-        stream.abort()
-      }
+        throw new Error("STUB");
     })
   }
 
   // in bun, `c` is destroyed when the request is returned, so hold it until the end of streaming
   contextStash.set(stream.responseReadable, c)
   ;(async () => {
-    try {
-      await cb(stream)
-    } catch (e) {
-      if (e === undefined) {
-        // If reading is canceled without a reason value (e.g. by StreamingApi)
-        // then the .pipeTo() promise will reject with undefined.
-        // In this case, do nothing because the stream is already closed.
-      } else if (e instanceof Error && onError) {
-        await onError(e, stream)
-      } else {
-        console.error(e)
-      }
-    } finally {
-      stream.close()
-    }
+      throw new Error("STUB");
   })()
 
   return c.newResponse(stream.responseReadable)

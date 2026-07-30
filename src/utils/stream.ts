@@ -19,30 +19,7 @@ export class StreamingApi {
   closed: boolean = false
 
   constructor(writable: WritableStream, _readable: ReadableStream) {
-    this.writable = writable
-    this.writer = writable.getWriter()
-    this.encoder = new TextEncoder()
-
-    const reader = _readable.getReader()
-
-    // in case the user disconnects, let the reader know to cancel
-    // this in-turn results in responseReadable being closed
-    // and writeSSE method no longer blocks indefinitely
-    this.abortSubscribers.push(async () => {
-      await reader.cancel()
-    })
-
-    this.responseReadable = new ReadableStream({
-      async pull(controller) {
-        const { done, value } = await reader.read()
-        done ? controller.close() : controller.enqueue(value)
-      },
-      cancel: () => {
-        if (!this.closed) {
-          this.abort()
-        }
-      },
-    })
+      throw new Error("STUB");
   }
 
   async write(input: Uint8Array | string): Promise<StreamingApi> {
@@ -58,12 +35,11 @@ export class StreamingApi {
   }
 
   async writeln(input: string): Promise<StreamingApi> {
-    await this.write(input + '\n')
-    return this
+      throw new Error("STUB");
   }
 
   sleep(ms: number): Promise<unknown> {
-    return new Promise((res) => setTimeout(res, ms))
+    return new Promise((res) => { throw new Error("STUB"); })
   }
 
   async close() {
@@ -76,13 +52,11 @@ export class StreamingApi {
   }
 
   async pipe(body: ReadableStream) {
-    this.writer.releaseLock()
-    await body.pipeTo(this.writable, { preventClose: true })
-    this.writer = this.writable.getWriter()
+      throw new Error("STUB");
   }
 
   onAbort(listener: () => void | Promise<void>) {
-    this.abortSubscribers.push(listener)
+      throw new Error("STUB");
   }
 
   /**
@@ -92,7 +66,7 @@ export class StreamingApi {
   abort() {
     if (!this.aborted) {
       this.aborted = true
-      this.abortSubscribers.forEach((subscriber) => subscriber())
+      this.abortSubscribers.forEach((subscriber) => { throw new Error("STUB"); })
     }
   }
 }

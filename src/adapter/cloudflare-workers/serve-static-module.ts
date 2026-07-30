@@ -6,7 +6,7 @@ import { serveStatic } from './serve-static'
 const module = <E extends Env = Env>(
   options: Omit<ServeStaticOptions<E>, 'namespace'>
 ): MiddlewareHandler => {
-  return serveStatic<E>(options)
+    throw new Error("STUB");
 }
 
 export { module as serveStatic }

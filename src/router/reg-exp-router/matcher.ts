@@ -12,20 +12,7 @@ export function match<R extends Router<T>, T>(this: R, method: string, path: str
   const matchers: MatcherMap<T> = (this as any).buildAllMatchers()
 
   const match = ((method, path) => {
-    const matcher = (matchers[method] || matchers[METHOD_NAME_ALL]) as Matcher<T>
-
-    const staticMatch = matcher[2][path]
-    if (staticMatch) {
-      return staticMatch
-    }
-
-    const match = path.match(matcher[0])
-    if (!match) {
-      return [[], emptyParam]
-    }
-
-    const index = match.indexOf('', 1)
-    return [matcher[1][index], match]
+      throw new Error("STUB");
   }) as Router<T>['match']
 
   this.match = match

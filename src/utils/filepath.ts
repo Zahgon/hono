@@ -10,23 +10,7 @@ type FilePathOptions = {
 }
 
 export const getFilePath = (options: FilePathOptions): string | undefined => {
-  let filename = options.filename
-  const defaultDocument = options.defaultDocument || 'index.html'
-
-  if (filename.endsWith('/')) {
-    // /top/ => /top/index.html
-    filename = filename.concat(defaultDocument)
-  } else if (!filename.match(/\.[a-zA-Z0-9_-]+$/)) {
-    // /top => /top/index.html
-    filename = filename.concat('/' + defaultDocument)
-  }
-
-  const path = getFilePathWithoutDefaultDocument({
-    root: options.root,
-    filename,
-  })
-
-  return path
+    throw new Error("STUB");
 }
 
 export const getFilePathWithoutDefaultDocument = (

@@ -28,8 +28,5 @@ type PoweredByOptions = {
  * ```
  */
 export const poweredBy = (options?: PoweredByOptions): MiddlewareHandler => {
-  return async function poweredBy(c, next) {
-    await next()
-    c.res.headers.set('X-Powered-By', options?.serverName ?? 'Hono')
-  }
+    throw new Error("STUB");
 }

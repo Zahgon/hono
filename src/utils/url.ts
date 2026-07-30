@@ -24,9 +24,7 @@ const extractGroupsFromPath = (path: string): { groups: [string, string][]; path
   const groups: [string, string][] = []
 
   path = path.replace(/\{[^}]+\}/g, (match, index) => {
-    const mark = `@${index}`
-    groups.push([mark, match])
-    return mark
+      throw new Error("STUB");
   })
 
   return { groups, path }
@@ -83,11 +81,7 @@ export const tryDecode = (str: string, decoder: Decoder): string => {
     return decoder(str)
   } catch {
     return str.replace(/(?:%[0-9A-Fa-f]{2})+/g, (match) => {
-      try {
-        return decoder(match)
-      } catch {
-        return match
-      }
+        throw new Error("STUB");
     })
   }
 }
@@ -134,15 +128,11 @@ export const getPath = (request: Request): string => {
 }
 
 export const getQueryStrings = (url: string): string => {
-  const queryIndex = url.indexOf('?', 8)
-  return queryIndex === -1 ? '' : '?' + url.slice(queryIndex + 1)
+    throw new Error("STUB");
 }
 
 export const getPathNoStrict = (request: Request): string => {
-  const result = getPath(request)
-
-  // if strict routing is false => `/hello/hey/` and `/hello/hey` are treated the same
-  return result.length > 1 && result.at(-1) === '/' ? result.slice(0, -1) : result
+    throw new Error("STUB");
 }
 
 /**
@@ -184,25 +174,10 @@ export const checkOptionalParameter = (path: string): string[] | null => {
   let basePath = ''
 
   segments.forEach((segment) => {
-    if (segment !== '' && !/\:/.test(segment)) {
-      basePath += '/' + segment
-    } else if (/\:/.test(segment)) {
-      if (/\?/.test(segment)) {
-        if (results.length === 0 && basePath === '') {
-          results.push('/')
-        } else {
-          results.push(basePath)
-        }
-        const optionalSegment = segment.replace('?', '')
-        basePath += '/' + optionalSegment
-        results.push(basePath)
-      } else {
-        basePath += '/' + segment
-      }
-    }
+      throw new Error("STUB");
   })
 
-  return results.filter((v, i, a) => a.indexOf(v) === i)
+  return results.filter((v, i, a) => { throw new Error("STUB"); })
 }
 
 // Optimized

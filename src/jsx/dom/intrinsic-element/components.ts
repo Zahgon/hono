@@ -16,8 +16,7 @@ import { createPortal, getNameSpaceContext } from '../render'
 
 // this function is a testing utility and should not be exported to the user
 export const clearCache = () => {
-  blockingPromiseMap = Object.create(null)
-  createdElements = Object.create(null)
+    throw new Error("STUB");
 }
 
 // this function is exported for testing and should not be used by the user
@@ -26,29 +25,7 @@ export const composeRef = <T>(
   cb: (e: T) => void | (() => void)
 ): ((e: T) => () => void) => {
   return useMemo(
-    () => (e: T) => {
-      let refCleanup: (() => void) | undefined
-      if (ref) {
-        if (typeof ref === 'function') {
-          refCleanup =
-            ref(e) ||
-            (() => {
-              ref(null)
-            })
-        } else if (ref && 'current' in ref) {
-          ref.current = e
-          refCleanup = () => {
-            ref.current = null
-          }
-        }
-      }
-
-      const cbCleanup = cb(e)
-      return () => {
-        cbCleanup?.()
-        refCleanup?.()
-      }
-    },
+    () => { throw new Error("STUB"); },
     [ref]
   )
 }
@@ -98,21 +75,12 @@ const documentMetadataTag = (
 
     if (!element) {
       const cacheKey = deDupeKeys.reduce(
-        (acc, key) => (props[key] === undefined ? acc : `${acc}-${key}-${props[key]}`),
+        (acc, key) => { throw new Error("STUB"); },
         tag
       )
       created = !createdElements[cacheKey]
       element = createdElements[cacheKey] ||= (() => {
-        const e = document.createElement(tag)
-        for (const key of deDupeKeys) {
-          if (props[key] !== undefined) {
-            e.setAttribute(key, props[key] as string)
-          }
-        }
-        if (props.rel) {
-          e.setAttribute('rel', props.rel)
-        }
-        return e
+          throw new Error("STUB");
       })()
     }
   } else {
@@ -126,98 +94,13 @@ const documentMetadataTag = (
 
   const insert = useCallback(
     (e: HTMLElement) => {
-      if (deDupeByKey) {
-        if (tag === 'link' && precedence !== undefined) {
-          let found = false
-          for (const existingElement of head.querySelectorAll<HTMLElement>(tag)) {
-            const existingPrecedence = existingElement.getAttribute(dataPrecedenceAttr)
-            if (existingPrecedence === null) {
-              head.insertBefore(e, existingElement)
-              return
-            }
-            if (found && existingPrecedence !== precedence) {
-              head.insertBefore(e, existingElement)
-              return
-            }
-            if (existingPrecedence === precedence) {
-              found = true
-            }
-          }
-
-          // if sentinel is not found, append to the end
-          head.appendChild(e)
-          return
-        }
-
-        let found = false
-        for (const existingElement of head.querySelectorAll<HTMLElement>(tag)) {
-          if (found && existingElement.getAttribute(dataPrecedenceAttr) !== precedence) {
-            head.insertBefore(e, existingElement)
-            return
-          }
-          if (existingElement.getAttribute(dataPrecedenceAttr) === precedence) {
-            found = true
-          }
-        }
-
-        // if sentinel is not found, append to the end
-        head.appendChild(e)
-      } else if (tag === 'link') {
-        if (!head.contains(e)) {
-          head.appendChild(e)
-        }
-      } else if (existingElements) {
-        let found = false
-        for (const existingElement of existingElements!) {
-          if (existingElement === e) {
-            found = true
-            break
-          }
-        }
-        if (!found) {
-          // newly created element
-          head.insertBefore(
-            e,
-            head.contains(existingElements[0]) ? existingElements[0] : head.querySelector(tag)
-          )
-        }
-        existingElements = undefined
-      }
-    },
+          throw new Error("STUB");
+      },
     [deDupeByKey, precedence, tag]
   )
 
   const ref = composeRef(props.ref, (e: HTMLElement) => {
-    const key = deDupeKeys[0]
-
-    if (preserveNodeType === 2) {
-      e.innerHTML = ''
-    }
-
-    if (created || existingElements) {
-      insert(e)
-    }
-
-    if (!onError && !onLoad) {
-      return
-    }
-    if (!key) {
-      return
-    }
-
-    let promise = (blockingPromiseMap[e.getAttribute(key) as string] ||= new Promise<Event>(
-      (resolve, reject) => {
-        e.addEventListener('load', resolve)
-        e.addEventListener('error', reject)
-      }
-    ))
-    if (onLoad) {
-      promise = promise.then(onLoad)
-    }
-    if (onError) {
-      promise = promise.catch(onError)
-    }
-    promise.catch(() => {})
+      throw new Error("STUB");
   })
 
   if (supportBlocking && blocking === 'render') {
@@ -225,9 +108,7 @@ const documentMetadataTag = (
     if (key && props[key]) {
       const value = props[key]
       const promise = (blockingPromiseMap[value] ||= new Promise<Event>((resolve, reject) => {
-        insert(element as HTMLElement)
-        element!.addEventListener('load', resolve)
-        element!.addEventListener('error', reject)
+          throw new Error("STUB");
       }))
       use(promise)
     }
@@ -255,64 +136,23 @@ const documentMetadataTag = (
   ) as any
 }
 export const title: FC<PropsWithChildren> = (props) => {
-  const nameSpaceContext = getNameSpaceContext()
-  const ns = nameSpaceContext && useContext(nameSpaceContext)
-  if (ns?.endsWith('svg')) {
-    return {
-      tag: 'title',
-      props,
-      type: 'title',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ref: (props as any).ref,
-    } as unknown as JSXNode
-  }
-  return documentMetadataTag('title', props, undefined, false, false)
+    throw new Error("STUB");
 }
 
 export const script: FC<PropsWithChildren<IntrinsicElements['script']>> = (props) => {
-  if (!props || ['src', 'async'].some((k) => !props[k])) {
-    return {
-      tag: 'script',
-      props,
-      type: 'script',
-      ref: props.ref,
-    } as unknown as JSXNode
-  }
-  return documentMetadataTag('script', props, 1, false, true)
+    throw new Error("STUB");
 }
 
 export const style: FC<PropsWithChildren<IntrinsicElements['style']>> = (props) => {
-  if (!props || !['href', 'precedence'].every((k) => k in props)) {
-    return {
-      tag: 'style',
-      props,
-      type: 'style',
-      ref: props.ref,
-    } as unknown as JSXNode
-  }
-  props['data-href'] = props.href
-  delete props.href
-  return documentMetadataTag('style', props, 2, true, true)
+    throw new Error("STUB");
 }
 
 export const link: FC<PropsWithChildren<IntrinsicElements['link']>> = (props) => {
-  if (
-    !props ||
-    ['onLoad', 'onError'].some((k) => k in props) ||
-    (props.rel === 'stylesheet' && (!('precedence' in props) || 'disabled' in props))
-  ) {
-    return {
-      tag: 'link',
-      props,
-      type: 'link',
-      ref: props.ref,
-    } as unknown as JSXNode
-  }
-  return documentMetadataTag('link', props, 1, isStylesheetLinkWithPrecedence(props), true)
+    throw new Error("STUB");
 }
 
 export const meta: FC<PropsWithChildren> = (props) => {
-  return documentMetadataTag('meta', props, undefined, false, false)
+    throw new Error("STUB");
 }
 
 const customEventFormAction = Symbol()
@@ -323,66 +163,7 @@ export const form: FC<
     ref?: RefObject<HTMLFormElement> | ((e: HTMLFormElement | null) => void | (() => void))
   }>
 > = (props) => {
-  const { action, ...restProps } = props
-  if (typeof action !== 'function') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(restProps as any).action = action
-  }
-
-  const [state, setState] = useState<[FormData | null, boolean]>([null, false]) // [FormData, isDirty]
-  const onSubmit = useCallback<(ev: SubmitEvent | CustomEvent) => void>(
-    async (ev: SubmitEvent | CustomEvent) => {
-      const currentAction = ev.isTrusted
-        ? action
-        : (ev as CustomEvent).detail[customEventFormAction]
-      if (typeof currentAction !== 'function') {
-        return
-      }
-
-      ev.preventDefault()
-      const formData = new FormData(ev.target as HTMLFormElement)
-      setState([formData, true])
-      const actionRes = currentAction(formData)
-      if (actionRes instanceof Promise) {
-        registerAction(actionRes)
-        await actionRes
-      }
-      setState([null, true])
-    },
-    []
-  )
-
-  const ref = composeRef(props.ref, (el: HTMLFormElement) => {
-    el.addEventListener('submit', onSubmit)
-    return () => {
-      el.removeEventListener('submit', onSubmit)
-    }
-  })
-
-  const [data, isDirty] = state
-  state[1] = false
-  return {
-    tag: FormContext as unknown as Function,
-    props: {
-      value: {
-        pending: data !== null,
-        data,
-        method: data ? 'post' : null,
-        action: data ? action : null,
-      },
-      children: {
-        tag: 'form',
-        props: {
-          ...restProps,
-          ref,
-        },
-        type: 'form',
-        ref,
-      },
-    },
-    f: isDirty,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any
+    throw new Error("STUB");
 }
 
 const formActionableElement = (
@@ -397,17 +178,11 @@ const formActionableElement = (
 ) => {
   if (typeof formAction === 'function') {
     const onClick = useCallback<(ev: MouseEvent) => void>((ev: MouseEvent) => {
-      ev.preventDefault()
-      ;(ev.currentTarget! as HTMLInputElement).form!.dispatchEvent(
-        new CustomEvent('submit', { detail: { [customEventFormAction]: formAction } })
-      )
+        throw new Error("STUB");
     }, [])
 
     props.ref = composeRef(props.ref, (el: HTMLInputElement) => {
-      el.addEventListener('click', onClick)
-      return () => {
-        el.removeEventListener('click', onClick)
-      }
+        throw new Error("STUB");
     })
   }
 
@@ -421,10 +196,10 @@ const formActionableElement = (
 }
 
 export const input: FC<PropsWithChildren<IntrinsicElements['input']>> = (props) =>
-  formActionableElement('input', props)
+  { throw new Error("STUB"); }
 
 export const button: FC<PropsWithChildren<IntrinsicElements['button']>> = (props) =>
-  formActionableElement('button', props)
+  { throw new Error("STUB"); }
 
 Object.assign(domRenderers, {
   title,

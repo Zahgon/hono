@@ -51,7 +51,7 @@ const renderToReadableStream = async (
   element: Child,
   options: RenderToReadableStreamOptions = {}
 ): Promise<ReadableStream<Uint8Array>> => {
-  if (Object.keys(options).some((key) => key !== 'onError')) {
+  if (Object.keys(options).some((key) => { throw new Error("STUB"); })) {
     console.warn('options are not supported yet, except onError')
   }
 

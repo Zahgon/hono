@@ -11,29 +11,13 @@ export const ErrorBoundary: FC<
     onError?: ErrorHandler
   }>
 > = (({ children, fallback, fallbackRender, onError }: any) => {
-  const res = Fragment({ children })
-  ;(res as any)[DOM_ERROR_HANDLER] = (err: any) => {
-    if (err instanceof Promise) {
-      throw err
-    }
-    onError?.(err)
-    return fallbackRender?.(err) || fallback
-  }
-  return res
-}) as any
+        throw new Error("STUB");
+    }) as any
 
 export const Suspense: FC<PropsWithChildren<{ fallback: any }>> = (({
   children,
   fallback,
 }: any) => {
-  const res = Fragment({ children })
-  ;(res as any)[DOM_ERROR_HANDLER] = (err: any, retry: () => void) => {
-    if (!(err instanceof Promise)) {
-      throw err
-    }
-    err.finally(retry)
-    return fallback
-  }
-  return res
+    throw new Error("STUB");
 }) as any
 /* eslint-enable @typescript-eslint/no-explicit-any */

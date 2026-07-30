@@ -13,7 +13,9 @@ import {
 } from './utils'
 
 const createProxy = (callback: Callback, path: string[]) => {
-  const proxy: unknown = new Proxy(() => {}, {
+  const proxy: unknown = new Proxy(() => {
+      throw new Error("STUB");
+  }, {
     get(_obj, key) {
       if (typeof key !== 'string' || key === 'then') {
         return undefined
@@ -135,98 +137,5 @@ export const hc = <T extends Hono<any, any, any>, Prefix extends string = string
   options?: ClientRequestOptions
 ) =>
   createProxy(function proxyCallback(opts) {
-    const buildSearchParamsOption = options?.buildSearchParams ?? buildSearchParams
-    const parts = [...opts.path]
-    const lastParts = parts.slice(-3).reverse()
-
-    // allow calling .toString() and .valueOf() on the proxy
-    if (lastParts[0] === 'toString') {
-      if (lastParts[1] === 'name') {
-        // e.g. hc().somePath.name.toString() -> "somePath"
-        return lastParts[2] || ''
-      }
-      // e.g. hc().somePath.toString()
-      return proxyCallback.toString()
-    }
-
-    if (lastParts[0] === 'valueOf') {
-      if (lastParts[1] === 'name') {
-        // e.g. hc().somePath.name.valueOf() -> "somePath"
-        return lastParts[2] || ''
-      }
-      // e.g. hc().somePath.valueOf()
-      return proxyCallback
-    }
-
-    let method = ''
-    if (/^\$/.test(lastParts[0] as string)) {
-      const last = parts.pop()
-      if (last) {
-        method = last.replace(/^\$/, '')
-      }
-    }
-
-    const path = parts.join('/')
-    const url = mergePath(baseUrl, path)
-    if (method === 'url' || method === 'path') {
-      let result = url
-      if (opts.args[0]) {
-        if (opts.args[0].param) {
-          result = replaceUrlParam(url, opts.args[0].param)
-        }
-        if (opts.args[0].query) {
-          result = result + '?' + buildSearchParamsOption(opts.args[0].query).toString()
-        }
-      }
-      result = removeIndexString(result)
-      if (method === 'url') {
-        return new URL(result)
-      }
-      return result.slice(baseUrl.replace(/\/+$/, '').length).replace(/^\/?/, '/')
-    }
-    if (method === 'ws') {
-      const webSocketUrl = replaceUrlProtocol(
-        opts.args[0] && opts.args[0].param ? replaceUrlParam(url, opts.args[0].param) : url,
-        'ws'
-      )
-      const targetUrl = new URL(webSocketUrl)
-
-      const queryParams: Record<string, string | string[]> | undefined = opts.args[0]?.query
-      if (queryParams) {
-        Object.entries(queryParams).forEach(([key, value]) => {
-          if (Array.isArray(value)) {
-            value.forEach((item) => targetUrl.searchParams.append(key, item))
-          } else {
-            targetUrl.searchParams.set(key, value)
-          }
-        })
-      }
-      const establishWebSocket = (...args: ConstructorParameters<typeof WebSocket>) => {
-        if (options?.webSocket !== undefined && typeof options.webSocket === 'function') {
-          return options.webSocket(...args)
-        }
-        return new WebSocket(...args)
-      }
-
-      return establishWebSocket(targetUrl.toString())
-    }
-
-    const req = new ClientRequestImpl(url, method, {
-      buildSearchParams: buildSearchParamsOption,
-    })
-    if (method) {
-      options ??= {}
-      const reqOptions: ClientRequestOptions = { ...opts.args[1] }
-      const baseHeaders = options.headers
-      const reqHeaders = reqOptions.headers
-      if (baseHeaders && reqHeaders) {
-        reqOptions.headers = async () => ({
-          ...(typeof baseHeaders === 'function' ? await baseHeaders() : baseHeaders),
-          ...(typeof reqHeaders === 'function' ? await reqHeaders() : reqHeaders),
-        })
-      }
-      const args = deepMerge<ClientRequestOptions>(options, reqOptions)
-      return req.fetch(opts.args[0], args)
-    }
-    return req
+      throw new Error("STUB");
   }, []) as UnionToIntersection<Client<T, Prefix>>

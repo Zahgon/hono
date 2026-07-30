@@ -31,14 +31,7 @@ export class Node<T> {
   #params: Record<string, string> = emptyParams
 
   constructor(method?: string, handler?: T, children?: Record<string, Node<T>>) {
-    this.#children = children || Object.create(null)
-    this.#methods = []
-    if (method && handler) {
-      const m: Record<string, HandlerSet<T>> = Object.create(null)
-      m[method] = { handler, possibleKeys: [], score: 0 }
-      this.#methods = [m]
-    }
-    this.#patterns = []
+      throw new Error("STUB");
   }
 
   insert(method: string, path: string, handler: T): Node<T> {
@@ -76,7 +69,7 @@ export class Node<T> {
     curNode.#methods.push({
       [method]: {
         handler,
-        possibleKeys: possibleKeys.filter((v, i, a) => a.indexOf(v) === i),
+        possibleKeys: possibleKeys.filter((v, i, a) => { throw new Error("STUB"); }),
         score: this.#order,
       },
     })
@@ -91,24 +84,7 @@ export class Node<T> {
     nodeParams: Record<string, string>,
     params?: Record<string, string>
   ): void {
-    for (let i = 0, len = node.#methods.length; i < len; i++) {
-      const m = node.#methods[i]
-      const handlerSet = (m[method] || m[METHOD_NAME_ALL]) as HandlerParamsSet<T>
-      const processedSet: Record<number, boolean> = {}
-      if (handlerSet !== undefined) {
-        handlerSet.params = Object.create(null)
-        handlerSets.push(handlerSet)
-        if (nodeParams !== emptyParams || (params && params !== emptyParams)) {
-          for (let i = 0, len = handlerSet.possibleKeys.length; i < len; i++) {
-            const key = handlerSet.possibleKeys[i]
-            const processed = processedSet[handlerSet.score]
-            handlerSet.params[key] =
-              params?.[key] && !processed ? params[key] : (nodeParams[key] ?? params?.[key])
-            processedSet[handlerSet.score] = true
-          }
-        }
-      }
-    }
+      throw new Error("STUB");
   }
 
   search(method: string, path: string): [[T, Params][]] {
@@ -236,10 +212,10 @@ export class Node<T> {
 
     if (handlerSets.length > 1) {
       handlerSets.sort((a, b) => {
-        return a.score - b.score
+          throw new Error("STUB");
       })
     }
 
-    return [handlerSets.map(({ handler, params }) => [handler, params] as [T, Params])]
+    return [handlerSets.map(({ handler, params }) => { throw new Error("STUB"); })]
   }
 }

@@ -11,14 +11,7 @@ export const X_HONO_DISABLE_SSG_HEADER_KEY = 'x-hono-disable-ssg'
  * This constant will be removed in the next minor version.
  */
 export const SSG_DISABLED_RESPONSE = (() => {
-  try {
-    return new Response('SSG is disabled', {
-      status: 404,
-      headers: { [X_HONO_DISABLE_SSG_HEADER_KEY]: 'true' },
-    })
-  } catch {
-    return null
-  }
+    throw new Error("STUB");
 })() as Response
 
 interface SSGParam {
@@ -40,13 +33,7 @@ export type AddedSSGDataRequest = Request & {
 /**
  * Define SSG Route
  */
-export const ssgParams: SSGParamsMiddleware = (params) => async (c, next) => {
-  if (isDynamicRoute(c.req.path)) {
-    ;(c.req.raw as AddedSSGDataRequest).ssgParams = Array.isArray(params) ? params : await params(c)
-    return c.notFound() // Prevent subsequent handler execution after ssgParams
-  }
-  await next()
-}
+export const ssgParams: SSGParamsMiddleware = (params) => { throw new Error("STUB"); }
 
 /**
  * @experimental
@@ -61,13 +48,7 @@ export const isSSGContext = (c: Context): boolean => !!c.env?.[SSG_CONTEXT]
  * The API might be changed.
  */
 export const disableSSG = (): MiddlewareHandler =>
-  async function disableSSG(c, next) {
-    if (isSSGContext(c)) {
-      c.header(X_HONO_DISABLE_SSG_HEADER_KEY, 'true')
-      return c.notFound()
-    }
-    await next()
-  }
+  { throw new Error("STUB"); }
 
 /**
  * @experimental
@@ -75,9 +56,4 @@ export const disableSSG = (): MiddlewareHandler =>
  * The API might be changed.
  */
 export const onlySSG = (): MiddlewareHandler =>
-  async function onlySSG(c, next) {
-    if (!isSSGContext(c)) {
-      return c.notFound()
-    }
-    await next()
-  }
+  { throw new Error("STUB"); }

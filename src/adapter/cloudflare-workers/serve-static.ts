@@ -22,21 +22,6 @@ export const serveStatic = <E extends Env = Env>(
   options: ServeStaticOptions<E> = {}
 ): MiddlewareHandler => {
   return async function serveStatic(c, next) {
-    const getContent = async (path: string) => {
-      return getContentFromKVAsset(path, {
-        manifest: options.manifest,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        namespace: options.namespace
-          ? options.namespace
-          : c.env
-            ? c.env.__STATIC_CONTENT
-            : undefined,
-      })
-    }
-    return baseServeStatic({
-      ...options,
-      getContent,
-    })(c, next)
+      throw new Error("STUB");
   }
 }

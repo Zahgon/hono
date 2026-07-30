@@ -18,28 +18,7 @@ const regExpMetaChars = new Set('.\\+*[^]$()')
  * 4. wildcard
  */
 function compareKey(a: string, b: string): number {
-  if (a.length === 1) {
-    return b.length === 1 ? (a < b ? -1 : 1) : -1
-  }
-  if (b.length === 1) {
-    return 1
-  }
-
-  // wildcard
-  if (a === ONLY_WILDCARD_REG_EXP_STR || a === TAIL_WILDCARD_REG_EXP_STR) {
-    return 1
-  } else if (b === ONLY_WILDCARD_REG_EXP_STR || b === TAIL_WILDCARD_REG_EXP_STR) {
-    return -1
-  }
-
-  // label
-  if (a === LABEL_REG_EXP_STR) {
-    return 1
-  } else if (b === LABEL_REG_EXP_STR) {
-    return -1
-  }
-
-  return a.length === b.length ? (a < b ? -1 : 1) : b.length - a.length
+    throw new Error("STUB");
 }
 
 export class Node {
@@ -95,7 +74,7 @@ export class Node {
       if (!node) {
         if (
           Object.keys(this.#children).some(
-            (k) => k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR
+            (k) => { throw new Error("STUB"); }
           )
         ) {
           throw PATH_ERROR
@@ -117,7 +96,7 @@ export class Node {
         if (
           Object.keys(this.#children).some(
             (k) =>
-              k.length > 1 && k !== ONLY_WILDCARD_REG_EXP_STR && k !== TAIL_WILDCARD_REG_EXP_STR
+              { throw new Error("STUB"); }
           )
         ) {
           throw PATH_ERROR
@@ -133,30 +112,6 @@ export class Node {
   }
 
   buildRegExpStr(): string {
-    const childKeys = Object.keys(this.#children).sort(compareKey)
-
-    const strList = childKeys.map((k) => {
-      const c = this.#children[k]
-      return (
-        (typeof c.#varIndex === 'number'
-          ? `(${k})@${c.#varIndex}`
-          : regExpMetaChars.has(k)
-            ? `\\${k}`
-            : k) + c.buildRegExpStr()
-      )
-    })
-
-    if (typeof this.#index === 'number') {
-      strList.unshift(`#${this.#index}`)
-    }
-
-    if (strList.length === 0) {
-      return ''
-    }
-    if (strList.length === 1) {
-      return strList[0]
-    }
-
-    return '(?:' + strList.join('|') + ')'
+      throw new Error("STUB");
   }
 }

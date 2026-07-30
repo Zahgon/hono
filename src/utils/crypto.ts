@@ -13,21 +13,15 @@ type Algorithm = {
 type Data = string | boolean | number | JSONValue | ArrayBufferView | ArrayBuffer
 
 export const sha256 = async (data: Data): Promise<string | null> => {
-  const algorithm: Algorithm = { name: 'SHA-256', alias: 'sha256' }
-  const hash = await createHash(data, algorithm)
-  return hash
+    throw new Error("STUB");
 }
 
 export const sha1 = async (data: Data): Promise<string | null> => {
-  const algorithm: Algorithm = { name: 'SHA-1', alias: 'sha1' }
-  const hash = await createHash(data, algorithm)
-  return hash
+    throw new Error("STUB");
 }
 
 export const md5 = async (data: Data): Promise<string | null> => {
-  const algorithm: Algorithm = { name: 'MD5', alias: 'md5' }
-  const hash = await createHash(data, algorithm)
-  return hash
+    throw new Error("STUB");
 }
 
 export const createHash = async (data: Data, algorithm: Algorithm): Promise<string | null> => {
@@ -50,7 +44,7 @@ export const createHash = async (data: Data, algorithm: Algorithm): Promise<stri
       sourceBuffer as ArrayBuffer
     )
     const hash = Array.prototype.map
-      .call(new Uint8Array(buffer), (x) => ('00' + x.toString(16)).slice(-2))
+      .call(new Uint8Array(buffer), (x) => { throw new Error("STUB"); })
       .join('')
     return hash
   }

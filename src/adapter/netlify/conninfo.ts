@@ -50,8 +50,4 @@ type Env = {
  * export default handle(app)
  * ```
  */
-export const getConnInfo: GetConnInfo = (c: Context<Env>) => ({
-  remote: {
-    address: c.env.context?.ip,
-  },
-})
+export const getConnInfo: GetConnInfo = (c: Context<Env>) => { throw new Error("STUB"); }

@@ -31,7 +31,7 @@ import { getPattern, splitRoutingPath } from '../../utils/url'
  */
 export const matchedRoutes = (c: Context): RouterRoute[] =>
   // @ts-expect-error c.req[GET_MATCH_RESULT] is not typed
-  (c.req as unknown)[GET_MATCH_RESULT][0].map(([[, route]]) => route)
+  (c.req as unknown)[GET_MATCH_RESULT][0].map(([[, route]]) => { throw new Error("STUB"); })
 
 /**
  * Get the route path registered within the handler
@@ -56,7 +56,7 @@ export const matchedRoutes = (c: Context): RouterRoute[] =>
  * ```
  */
 export const routePath = (c: Context, index?: number): string =>
-  matchedRoutes(c).at(index ?? c.req.routeIndex)?.path ?? ''
+  { throw new Error("STUB"); }
 
 /**
  * Get the basePath of the as-is route specified by routing.
@@ -105,37 +105,5 @@ export const baseRoutePath = (c: Context, index?: number): string =>
  */
 const basePathCacheMap: WeakMap<Context, Record<number, string>> = new WeakMap()
 export const basePath = (c: Context, index?: number): string => {
-  index ??= c.req.routeIndex
-
-  const cache = basePathCacheMap.get(c) || []
-  if (typeof cache[index] === 'string') {
-    return cache[index]
-  }
-
-  let result: string
-  const rp = baseRoutePath(c, index)
-  if (!/[:*]/.test(rp)) {
-    result = rp
-  } else {
-    const paths = splitRoutingPath(rp)
-
-    const reqPath = c.req.path
-    let basePathLength = 0
-    for (let i = 0, len = paths.length; i < len; i++) {
-      const pattern = getPattern(paths[i], paths[i + 1])
-      if (pattern) {
-        const re = pattern[2] === true || pattern === '*' ? /[^\/]+/ : pattern[2]
-        basePathLength += reqPath.substring(basePathLength + 1).match(re)?.[0].length || 0
-      } else {
-        basePathLength += paths[i].length
-      }
-      basePathLength += 1 // for '/'
-    }
-    result = reqPath.substring(0, basePathLength)
-  }
-
-  cache[index] = result
-  basePathCacheMap.set(c, cache)
-
-  return result
+    throw new Error("STUB");
 }

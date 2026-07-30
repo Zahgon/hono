@@ -339,31 +339,22 @@ export class Factory<E extends Env = Env, P extends string = string> {
   }
 
   createApp = (options?: HonoOptions<E>): Hono<E> => {
-    const app = new Hono<E>(
-      options && this.#defaultAppOptions
-        ? { ...this.#defaultAppOptions, ...options }
-        : (options ?? this.#defaultAppOptions)
-    )
-    if (this.initApp) {
-      this.initApp(app)
-    }
-    return app
+      throw new Error("STUB");
   }
 
   createMiddleware = <I extends Input = {}, R extends HandlerResponse<any> | void = void>(
     middleware: MiddlewareHandler<E, P, I, R extends void ? Response : R>
-  ): MiddlewareHandler<E, P, I, R extends void ? Response : R> => middleware
+  ): MiddlewareHandler<E, P, I, R extends void ? Response : R> => { throw new Error("STUB"); }
 
   createHandlers: CreateHandlersInterface<E, P> = (...handlers: any) => {
-    // @ts-expect-error this should not be typed
-    return handlers.filter((handler) => handler !== undefined)
+      throw new Error("STUB");
   }
 }
 
 export const createFactory = <E extends Env = Env, P extends string = string>(init?: {
   initApp?: InitApp<E>
   defaultAppOptions?: HonoOptions<E>
-}): Factory<E, P> => new Factory<E, P>(init)
+}): Factory<E, P> => { throw new Error("STUB"); }
 
 export const createMiddleware = <
   E extends Env = any,
@@ -372,4 +363,4 @@ export const createMiddleware = <
   R extends HandlerResponse<any> | void = void,
 >(
   middleware: MiddlewareHandler<E, P, I, R extends void ? Response : R>
-): MiddlewareHandler<E, P, I, R extends void ? Response : R> => middleware
+): MiddlewareHandler<E, P, I, R extends void ? Response : R> => { throw new Error("STUB"); }

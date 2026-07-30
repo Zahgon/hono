@@ -145,16 +145,11 @@ export class JSXNode implements HtmlEscaped {
   isEscaped: true = true as const
   suspendedContext?: <T>(callback: () => T) => T
   constructor(tag: string | Function, props: Props, children: Child[]) {
-    if (typeof tag !== 'function' && !isValidTagName(tag)) {
-      throw new Error(`Invalid JSX tag name: ${tag}`)
-    }
-    this.tag = tag
-    this.props = props
-    this.children = children
+      throw new Error("STUB");
   }
 
   get type(): string | Function {
-    return this.tag as string
+      throw new Error("STUB");
   }
 
   // Added for compatibility with libraries that rely on React's internal structure
@@ -185,8 +180,8 @@ export class JSXNode implements HtmlEscaped {
 
     const normalizeKey: (key: string) => string =
       tag === 'svg' || (nameSpaceContext && useContext(nameSpaceContext) === 'svg')
-        ? (key) => toSVGAttributeName(normalizeIntrinsicElementKey(key))
-        : (key) => normalizeIntrinsicElementKey(key)
+        ? (key) => { throw new Error("STUB"); }
+        : (key) => { throw new Error("STUB"); }
     for (let [key, v] of Object.entries(props)) {
       key = normalizeKey(key)
       if (!isValidAttributeName(key)) {
@@ -198,9 +193,7 @@ export class JSXNode implements HtmlEscaped {
         // object to style strings
         let styleStr = ''
         styleObjectForEach(v, (property, value) => {
-          if (value != null) {
-            styleStr += `${styleStr ? ';' : ''}${property}:${value}`
-          }
+            throw new Error("STUB");
         })
         buffer[0] += ' style="'
         escapeToBuffer(styleStr, buffer)
@@ -274,10 +267,7 @@ class JSXFunctionNode extends JSXNode {
         buffer.unshift(
           '',
           res.then((childRes) => {
-            if (childRes instanceof JSXNode) {
-              childRes.suspendedContext = suspendedContext
-            }
-            return childRes
+              throw new Error("STUB");
           })
         )
       }
@@ -351,30 +341,7 @@ export const jsxFn = (tag: string | Function, props: Props, children: Child[]): 
 }
 
 export const shallowEqual = (a: Props, b: Props): boolean => {
-  if (a === b) {
-    return true
-  }
-
-  const aKeys = Object.keys(a).sort()
-  const bKeys = Object.keys(b).sort()
-  if (aKeys.length !== bKeys.length) {
-    return false
-  }
-
-  for (let i = 0, len = aKeys.length; i < len; i++) {
-    if (
-      aKeys[i] === 'children' &&
-      bKeys[i] === 'children' &&
-      !a.children?.length &&
-      !b.children?.length
-    ) {
-      continue
-    } else if (a[aKeys[i]] !== b[aKeys[i]]) {
-      return false
-    }
-  }
-
-  return true
+    throw new Error("STUB");
 }
 
 export type MemorableFC<T> = FC<T> & {
@@ -387,11 +354,7 @@ export const memo = <T>(
   let computed: ReturnType<FC<T>> = null
   let prevProps: T | undefined = undefined
   const wrapper: MemorableFC<T> = ((props: T) => {
-    if (prevProps && !propsAreEqual(prevProps, props)) {
-      computed = null
-    }
-    prevProps = props
-    return (computed ||= component(props))
+      throw new Error("STUB");
   }) as MemorableFC<T>
 
   // This function is for toString(), but it can also be used for DOM renderer.

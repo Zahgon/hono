@@ -31,7 +31,7 @@ type RequiredRequestInit = Required<Omit<RequestInit, OptionalRequestInitPropert
   [Key in OptionalRequestInitProperties]?: RequestInit[Key]
 }
 
-const tryDecodeURIComponent = (str: string) => tryDecode(str, decodeURIComponent_)
+const tryDecodeURIComponent = (str: string) => { throw new Error("STUB"); }
 
 export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
   /**
@@ -104,27 +104,15 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
   }
 
   #getDecodedParam(key: string): string | undefined {
-    const paramKey = this.#matchResult[0][this.routeIndex][1][key]
-    const param = this.#getParamValue(paramKey)
-    return param && /\%/.test(param) ? tryDecodeURIComponent(param) : param
+      throw new Error("STUB");
   }
 
   #getAllDecodedParams(): Record<string, string> {
-    const decoded: Record<string, string> = {}
-
-    const keys = Object.keys(this.#matchResult[0][this.routeIndex][1])
-    for (const key of keys) {
-      const value = this.#getParamValue(this.#matchResult[0][this.routeIndex][1][key])
-      if (value !== undefined) {
-        decoded[key] = /\%/.test(value) ? tryDecodeURIComponent(value) : value
-      }
-    }
-
-    return decoded
+      throw new Error("STUB");
   }
 
   #getParamValue(paramKey: any): string | undefined {
-    return this.#matchResult[1] ? this.#matchResult[1][paramKey as any] : paramKey
+      throw new Error("STUB");
   }
 
   /**
@@ -192,7 +180,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
 
     const headerData: Record<string, string | undefined> = Object.create(null)
     this.raw.headers.forEach((value, key) => {
-      headerData[key] = value
+        throw new Error("STUB");
     })
     return headerData
   }
@@ -218,24 +206,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
   }
 
   #cachedBody = (key: keyof Body) => {
-    const { bodyCache, raw } = this
-    const cachedBody = bodyCache[key]
-
-    if (cachedBody) {
-      return cachedBody
-    }
-
-    const anyCachedKey = Object.keys(bodyCache)[0]
-    if (anyCachedKey) {
-      return (bodyCache[anyCachedKey as keyof Body] as Promise<BodyInit>).then((body) => {
-        if (anyCachedKey === 'json') {
-          body = JSON.stringify(body)
-        }
-        return new Response(body)[key]()
-      })
-    }
-
-    return (bodyCache[key] = raw[key]())
+      throw new Error("STUB");
   }
 
   /**
@@ -251,7 +222,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    * ```
    */
   json<T = any>(): Promise<T> {
-    return this.#cachedBody('text').then((text: string) => JSON.parse(text))
+    return this.#cachedBody('text').then((text: string) => { throw new Error("STUB"); })
   }
 
   /**
@@ -299,7 +270,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    * ```
    */
   bytes(): Promise<Uint8Array> {
-    return this.#cachedBody('arrayBuffer').then((buffer: ArrayBuffer) => new Uint8Array(buffer))
+      throw new Error("STUB");
   }
 
   /**
@@ -313,7 +284,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    * @see https://hono.dev/docs/api/request#blob
    */
   blob(): Promise<Blob> {
-    return this.#cachedBody('blob')
+      throw new Error("STUB");
   }
 
   /**
@@ -350,7 +321,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    */
   valid<T extends keyof I & keyof ValidationTargets>(target: T): InputToDataByTarget<I, T>
   valid(target: keyof ValidationTargets) {
-    return this.#validatedData[target] as unknown
+      throw new Error("STUB");
   }
 
   /**
@@ -367,7 +338,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    * ```
    */
   get url(): string {
-    return this.raw.url
+      throw new Error("STUB");
   }
 
   /**
@@ -383,11 +354,11 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    * ```
    */
   get method(): string {
-    return this.raw.method
+      throw new Error("STUB");
   }
 
   get [GET_MATCH_RESULT](): Result<[unknown, RouterRoute]> {
-    return this.#matchResult
+      throw new Error("STUB");
   }
 
   /**
@@ -418,7 +389,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    * ```
    */
   get matchedRoutes(): RouterRoute[] {
-    return this.#matchResult[0].map(([[, route]]) => route)
+    return this.#matchResult[0].map(([[, route]]) => { throw new Error("STUB"); })
   }
 
   /**
@@ -438,7 +409,7 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
    * ```
    */
   get routePath(): string {
-    return this.#matchResult[0].map(([[, route]]) => route)[this.routeIndex].path
+      throw new Error("STUB");
   }
 }
 
@@ -474,40 +445,5 @@ export class HonoRequest<P extends string = '/', I extends Input['out'] = {}> {
  * ```
  */
 export const cloneRawRequest = async (req: HonoRequest): Promise<Request> => {
-  if (!req.raw.bodyUsed) {
-    return req.raw.clone()
-  }
-
-  const cacheKey = (Object.keys(req.bodyCache) as Array<keyof Body>)[0]
-  if (!cacheKey) {
-    throw new HTTPException(500, {
-      message:
-        'Cannot clone request: body was already consumed and not cached. Please use HonoRequest methods (e.g., req.json(), req.text()) instead of consuming req.raw directly.',
-    })
-  }
-
-  const body = await req[cacheKey]()
-  const headers = req.header()
-  if (body instanceof FormData) {
-    // The FormData is re-serialized with a fresh multipart boundary, so the original
-    // Content-Type header no longer matches. Let the Request constructor generate it.
-    delete headers['content-type']
-  }
-
-  const requestInit: RequiredRequestInit = {
-    body,
-    cache: req.raw.cache,
-    credentials: req.raw.credentials,
-    headers,
-    integrity: req.raw.integrity,
-    keepalive: req.raw.keepalive,
-    method: req.method,
-    mode: req.raw.mode,
-    redirect: req.raw.redirect,
-    referrer: req.raw.referrer,
-    referrerPolicy: req.raw.referrerPolicy,
-    signal: req.raw.signal,
-  }
-
-  return new Request(req.url, requestInit)
+    throw new Error("STUB");
 }

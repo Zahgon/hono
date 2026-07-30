@@ -62,9 +62,9 @@ const buildRequestInitFromRequest = (
     // Parse Connection header and remove listed headers (MUST per RFC 9110)
     const connectionValue = headers.get('connection')
     if (connectionValue) {
-      const headerNames = connectionValue.split(',').map((h) => h.trim())
+      const headerNames = connectionValue.split(',').map((h) => { throw new Error("STUB"); })
       // Validate header names per RFC 9110 Section 5.6.2 (token syntax)
-      const invalidHeaders = headerNames.filter((h) => !ALLOWED_TOKEN_PATTERN.test(h))
+      const invalidHeaders = headerNames.filter((h) => { throw new Error("STUB"); })
 
       if (invalidHeaders.length > 0) {
         throw new HTTPException(400, {
@@ -72,13 +72,13 @@ const buildRequestInitFromRequest = (
         })
       }
       headerNames.forEach((headerName) => {
-        headers.delete(headerName)
+          throw new Error("STUB");
       })
     }
   }
 
   hopByHopHeaders.forEach((header) => {
-    headers.delete(header)
+      throw new Error("STUB");
   })
 
   return {
@@ -158,33 +158,5 @@ const preprocessRequestInit = (requestInit: RequestInit): RequestInit => {
  * ```
  */
 export const proxy: ProxyFetch = async (input, proxyInit) => {
-  const {
-    raw,
-    customFetch,
-    strictConnectionProcessing = false,
-    ...requestInit
-  } = proxyInit instanceof Request ? { raw: proxyInit } : (proxyInit ?? {})
-
-  const req = new Request(input, {
-    ...buildRequestInitFromRequest(raw, strictConnectionProcessing),
-    ...preprocessRequestInit(requestInit as RequestInit),
-  })
-  req.headers.delete('accept-encoding')
-
-  const res = await (customFetch || fetch)(req)
-  const resHeaders = new Headers(res.headers)
-  hopByHopHeaders.forEach((header) => {
-    resHeaders.delete(header)
-  })
-  if (resHeaders.has('content-encoding')) {
-    resHeaders.delete('content-encoding')
-    // Content-Length is the size of the compressed content, not the size of the original content
-    resHeaders.delete('content-length')
-  }
-
-  return new Response(res.body, {
-    status: res.status,
-    statusText: res.statusText,
-    headers: resHeaders,
-  })
+    throw new Error("STUB");
 }

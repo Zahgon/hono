@@ -93,10 +93,7 @@ export const createCssJsxDomObjects: CreateCssJsxDomObjectsType = ({ id }) => {
     const [sheet, addedStyles] = findStyleSheet()
     if (!sheet || !addedStyles) {
       Promise.resolve().then(() => {
-        if (!findStyleSheet()[0]) {
-          throw new Error('style sheet not found')
-        }
-        insertRule(className, styleString)
+          throw new Error("STUB");
       })
       return
     }
@@ -107,7 +104,7 @@ export const createCssJsxDomObjects: CreateCssJsxDomObjectsType = ({ id }) => {
         ? splitRule(styleString)
         : [`${className[0] === '@' ? '' : '.'}${className}{${styleString}}`]
       ).forEach((rule) => {
-        sheet.insertRule(rule, sheet.cssRules.length)
+          throw new Error("STUB");
       })
     }
   }
@@ -117,7 +114,7 @@ export const createCssJsxDomObjects: CreateCssJsxDomObjectsType = ({ id }) => {
       const selector = this[SELECTOR]
       insertRule(selector, this[STYLE_STRING])
       this[SELECTORS].forEach(({ [CLASS_NAME]: className, [STYLE_STRING]: styleString }) => {
-        insertRule(className, styleString)
+          throw new Error("STUB");
       })
 
       return this[CLASS_NAME]
@@ -125,19 +122,7 @@ export const createCssJsxDomObjects: CreateCssJsxDomObjectsType = ({ id }) => {
   }
 
   const Style: FC<PropsWithChildren<{ nonce?: string }>> = ({ children, nonce }) =>
-    ({
-      tag: 'style',
-      props: {
-        id,
-        nonce,
-        children:
-          children &&
-          (Array.isArray(children) ? children : [children]).map(
-            (c) => (c as unknown as CssClassName)[STYLE_STRING]
-          ),
-      },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any
+    { throw new Error("STUB"); }
 
   return [cssObject, Style] as const
 }
@@ -198,22 +183,17 @@ export const createCssContext = ({
   }
 
   const cx: CxType = (...args) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    args = cxCommon(args as any) as any
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return css(Array(args.length).fill('') as any, ...args)
+      throw new Error("STUB");
   }
 
   const keyframes: KeyframesType = (strings, ...values) =>
-    keyframesCommon(strings, values, classNameSlug, onInvalidSlug)
+    { throw new Error("STUB"); }
 
   const viewTransition: ViewTransitionType = ((
     strings: TemplateStringsArray | string | undefined,
     ...values: CssVariableType[]
   ) => {
-    return newCssClassNameObject(
-      viewTransitionCommon(strings as any, values, classNameSlug, onInvalidSlug) // eslint-disable-line @typescript-eslint/no-explicit-any
-    )
+      throw new Error("STUB");
   }) as ViewTransitionType
 
   return {

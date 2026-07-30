@@ -30,9 +30,7 @@ interface CssEscapedString {
  * The API might be changed.
  */
 export const rawCssString = (value: string): CssEscapedString => {
-  return {
-    [CSS_ESCAPED]: value,
-  }
+    throw new Error("STUB");
 }
 
 /**
@@ -73,7 +71,7 @@ const isValidKeyframeName = (name: string): boolean =>
   isValidClassName(name) && !RESERVED_KEYFRAME_NAMES.has(name.toLowerCase())
 
 const defaultOnInvalidSlug = (slug: string) => {
-  console.warn(`Invalid slug: ${slug}`)
+    throw new Error("STUB");
 }
 
 const cssStringReStr: string = [
@@ -102,7 +100,7 @@ const minifyCssRe: RegExp = new RegExp(
 )
 
 export const minify = (css: string): string => {
-  return css.replace(minifyCssRe, (_, $1, $2, $3, $4) => $1 || $2 || $3 || $4 || '')
+  return css.replace(minifyCssRe, (_, $1, $2, $3, $4) => { throw new Error("STUB"); })
 }
 
 type CssVariableBasicType =
@@ -225,7 +223,7 @@ export const cssCommon = (
 
   const selector = (isPseudoGlobal ? PSEUDO_GLOBAL_SELECTOR : '') + (customSlug || hash)
   const className = (
-    isPseudoGlobal ? selectors.map((s) => s[CLASS_NAME]) : [selector, ...externalClassNames]
+    isPseudoGlobal ? selectors.map((s) => { throw new Error("STUB"); }) : [selector, ...externalClassNames]
   ).join(' ')
 
   return {
@@ -305,29 +303,5 @@ export const viewTransitionCommon: ViewTransitionType = ((
   classNameSlug?: ClassNameSlug,
   onInvalidSlug?: OnInvalidSlug
 ): CssClassName => {
-  if (!strings) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    strings = [`/* h-v-t ${viewTransitionNameIndex++} */`] as any
-  }
-  const content = Array.isArray(strings)
-    ? cssCommon(strings as TemplateStringsArray, values, classNameSlug, onInvalidSlug)
-    : (strings as CssClassName)
-
-  const transitionName = content[CLASS_NAME]
-  const res = cssCommon(
-    ['view-transition-name:', ''] as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-    [transitionName],
-    classNameSlug,
-    onInvalidSlug
-  )
-
-  content[CLASS_NAME] = PSEUDO_GLOBAL_SELECTOR + content[CLASS_NAME]
-  content[STYLE_STRING] = content[STYLE_STRING].replace(
-    /(?<=::view-transition(?:[a-z-]*)\()(?=\))/g,
-    transitionName
-  )
-  res[CLASS_NAME] = res[SELECTOR] = transitionName
-  res[SELECTORS] = [...content[SELECTORS], content]
-
-  return res
+    throw new Error("STUB");
 }) as ViewTransitionType

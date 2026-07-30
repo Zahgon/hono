@@ -31,7 +31,7 @@ const isDepsChanged = (
   !prevDeps ||
   !deps ||
   prevDeps.length !== deps.length ||
-  deps.some((dep, i) => dep !== prevDeps[i])
+  deps.some((dep, i) => { throw new Error("STUB"); })
 
 let viewTransitionState:
   | [
@@ -57,23 +57,7 @@ const viewTransitionHook = (
   node: Node,
   cb: (context: Context) => void
 ): Promise<void> => {
-  const state: [boolean, boolean] = [true, false]
-  let lastVC = node.vC
-  return documentStartViewTransition(() => {
-    if (lastVC === node.vC) {
-      viewTransitionState = state
-      cb(context)
-      viewTransitionState = undefined
-      lastVC = node.vC
-    }
-  }).finished.then(() => {
-    if (state[1] && lastVC === node.vC) {
-      state[0] = false
-      viewTransitionState = state
-      cb(context)
-      viewTransitionState = undefined
-    }
-  })
+    throw new Error("STUB");
 }
 
 export const startViewTransition = (callback: () => void): void => {
@@ -89,7 +73,9 @@ export const startViewTransition = (callback: () => void): void => {
 export const useViewTransition = (): [boolean, (callback: () => void) => void] => {
   const buildData = buildDataStack.at(-1) as [Context, NodeObject]
   if (!buildData) {
-    return [false, () => {}]
+    return [false, () => {
+        throw new Error("STUB");
+    }]
   }
 
   if (viewTransitionState) {
@@ -102,7 +88,7 @@ export const useViewTransition = (): [boolean, (callback: () => void) => void] =
 const pendingStack: [PendingType | 3, Promise<void>][] = []
 const runCallback = (type: PendingType, callback: Function): void => {
   let resolve: (() => void) | undefined
-  const promise = new Promise<void>((r) => (resolve = r))
+  const promise = new Promise<void>((r) => { throw new Error("STUB"); })
   pendingStack.push([type, promise])
   try {
     const res = callback()
@@ -126,7 +112,9 @@ const startTransitionHook = (callback: () => void | Promise<void>): void => {
 export const useTransition = (): [boolean, (callback: () => void | Promise<void>) => void] => {
   const buildData = buildDataStack.at(-1) as [Context, NodeObject]
   if (!buildData) {
-    return [false, () => {}]
+    return [false, () => {
+        throw new Error("STUB");
+    }]
   }
 
   const [error, setError] = useState<[Error]>()
@@ -136,17 +124,8 @@ export const useTransition = (): [boolean, (callback: () => void | Promise<void>
   }
   const startTransitionLocalHook = useCallback<typeof startTransitionHook>(
     (callback) => {
-      startTransitionHook(() => {
-        updateState((state) => !state)
-        let res = callback()
-        if (res instanceof Promise) {
-          res = res.catch((e) => {
-            setError([e])
-          })
-        }
-        return res
-      })
-    },
+          throw new Error("STUB");
+      },
     [state]
   )
 
@@ -165,8 +144,7 @@ export const useDeferredValue: UseDeferredValue = <T>(value: T, ...rest: [T | un
 
   pendingStack.push([3, Promise.resolve()])
   updateHook = async (context: Context, _, cb: (context: Context) => void) => {
-    cb(context)
-    values[0] = value
+      throw new Error("STUB");
   }
   setValues([values[0], value])
   updateHook = undefined
@@ -187,7 +165,9 @@ export const useState: UseStateType = <T>(
 
   const buildData = buildDataStack.at(-1) as [unknown, NodeObject]
   if (!buildData) {
-    return [resolveInitialState(), () => {}]
+    return [resolveInitialState(), () => {
+        throw new Error("STUB");
+    }]
   }
   const [, node] = buildData
 
@@ -197,47 +177,7 @@ export const useState: UseStateType = <T>(
   return (stateArray[hookIndex] ||= [
     resolveInitialState(),
     (newState: T | ((currentState: T) => T)) => {
-      const localUpdateHook = updateHook
-      const stateData = stateArray[hookIndex]
-      if (typeof newState === 'function') {
-        newState = (newState as (currentState: T) => T)(stateData[0])
-      }
-
-      if (!Object.is(newState, stateData[0])) {
-        stateData[0] = newState
-        if (pendingStack.length) {
-          const [pendingType, pendingPromise] = pendingStack.at(-1) as [
-            PendingType | 3,
-            Promise<void>,
-          ]
-          Promise.all([
-            pendingType === 3
-              ? node
-              : update([pendingType, false, localUpdateHook as UpdateHook], node),
-            pendingPromise,
-          ]).then(([node]) => {
-            if (!node || !(pendingType === 2 || pendingType === 3)) {
-              return
-            }
-
-            const lastVC = node.vC
-
-            const addUpdateTask = () => {
-              setTimeout(() => {
-                // return if `node` is rerendered after current transition
-                if (lastVC !== node.vC) {
-                  return
-                }
-                update([pendingType === 3 ? 1 : 0, false, localUpdateHook as UpdateHook], node)
-              })
-            }
-
-            requestAnimationFrame(addUpdateTask)
-          })
-        } else {
-          update([0, false, localUpdateHook as UpdateHook], node)
-        }
-      }
+        throw new Error("STUB");
     },
   ])
 }
@@ -249,11 +189,11 @@ export const useReducer = <T, A>(
 ): [T, (action: A) => void] => {
   const handler = useCallback(
     (action: A) => {
-      setState((state) => reducer(state, action))
-    },
+          throw new Error("STUB");
+      },
     [reducer]
   )
-  const [state, setState] = useState(() => (init ? init(initialArg) : initialArg))
+  const [state, setState] = useState(() => { throw new Error("STUB"); })
   return [state, handler]
 }
 
@@ -277,8 +217,7 @@ const useEffectCommon = (
       prevCleanup()
     }
     const runner = () => {
-      data[index] = undefined // clear this effect in order to avoid calling effect twice
-      data[2] = effect() as (() => void) | undefined
+        throw new Error("STUB");
     }
     const data: EffectData = [deps, undefined, undefined, undefined, undefined]
     data[index] = runner
@@ -338,8 +277,8 @@ export const use = <T>(promise: Promise<T>): T => {
     return cachedRes[0] as T
   }
   promise.then(
-    (res) => resolvedPromiseValueMap.set(promise, [res]),
-    (e) => resolvedPromiseValueMap.set(promise, [undefined, e])
+    (res) => { throw new Error("STUB"); },
+    (e) => { throw new Error("STUB"); }
   )
 
   throw promise
@@ -363,7 +302,7 @@ export const useMemo = <T>(factory: () => T, deps: readonly unknown[]): T => {
 }
 
 let idCounter = 0
-export const useId = (): string => useMemo(() => `:r${(idCounter++).toString(32)}:`, [])
+export const useId = (): string => useMemo(() => { throw new Error("STUB"); }, [])
 
 // Define to avoid errors. This hook currently does nothing.
 export const useDebugValue = (_value: unknown, _formatter?: (value: unknown) => string): void => {}
@@ -376,8 +315,7 @@ export const forwardRef = <T, P = {}>(
   Component: (props: P, ref?: RefObject<T>) => JSX.Element
 ): ((props: P & { ref?: RefObject<T> }) => JSX.Element) => {
   return (props) => {
-    const { ref, ...rest } = props
-    return Component(rest as P, ref)
+      throw new Error("STUB");
   }
 }
 
@@ -387,10 +325,7 @@ export const useImperativeHandle = <T>(
   deps: readonly unknown[]
 ): void => {
   useEffect(() => {
-    ref.current = createHandle()
-    return () => {
-      ref.current = null
-    }
+      throw new Error("STUB");
   }, deps)
 }
 
@@ -418,16 +353,10 @@ export const useSyncExternalStore = <T>(
   // Swap subscriptions at effect flush: a returned cleanup would run synchronously
   // during render when `subscribe` changes, leaving a window with no subscription.
   useEffect(() => {
-    const update = () => setVersion((version) => version + 1)
-    unsubscribeRef.current?.()
-    unsubscribeRef.current = subscribe(update)
-    const [snapshot, getSnapshot] = latestSnapshot.current!
-    if (!Object.is(snapshot, getSnapshot())) {
-      update()
-    }
+      throw new Error("STUB");
   }, [subscribe])
 
-  useEffect(() => () => unsubscribeRef.current?.(), [])
+  useEffect(() => { throw new Error("STUB"); }, [])
 
   return snapshot
 }

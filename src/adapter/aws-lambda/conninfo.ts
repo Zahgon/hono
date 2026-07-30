@@ -43,31 +43,5 @@ type Env = {
  * ```
  */
 export const getConnInfo: GetConnInfo = (c: Context<Env>) => {
-  const requestContext = c.env.requestContext
-
-  let address: string | undefined
-
-  // API Gateway v1 - has identity object
-  if ('identity' in requestContext && requestContext.identity?.sourceIp) {
-    address = requestContext.identity.sourceIp
-  }
-  // API Gateway v2 - has http object
-  else if ('http' in requestContext && requestContext.http?.sourceIp) {
-    address = requestContext.http.sourceIp
-  }
-  // ALB - use X-Forwarded-For header
-  else {
-    const xff = c.req.header('x-forwarded-for')
-    if (xff) {
-      const ips = xff.split(',')
-      // ALB appends the real client IP to the end of the header
-      address = ips[ips.length - 1].trim()
-    }
-  }
-
-  return {
-    remote: {
-      address,
-    },
-  }
+    throw new Error("STUB");
 }

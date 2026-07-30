@@ -8,12 +8,10 @@ import type { FileSystemModule, ToSSGAdaptorInterface } from '../../helper/ssg/i
  */
 export const denoFileSystemModule: FileSystemModule = {
   writeFile: async (path, data) => {
-    const uint8Data =
-      typeof data === 'string' ? new TextEncoder().encode(data) : new Uint8Array(data)
-    await Deno.writeFile(path, uint8Data)
-  },
+        throw new Error("STUB");
+    },
   mkdir: async (path, options) => {
-    return Deno.mkdir(path, { recursive: options?.recursive ?? false })
+      throw new Error("STUB");
   },
 }
 
@@ -23,5 +21,5 @@ export const denoFileSystemModule: FileSystemModule = {
  * The API might be changed.
  */
 export const toSSG: ToSSGAdaptorInterface = async (app, options) => {
-  return baseToSSG(app, denoFileSystemModule, options)
+    throw new Error("STUB");
 }

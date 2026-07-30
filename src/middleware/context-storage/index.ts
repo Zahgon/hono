@@ -41,9 +41,7 @@ const asyncLocalStorage = new AsyncLocalStorage<Context>()
  * ```
  */
 export const contextStorage = (): MiddlewareHandler => {
-  return async function contextStorage(c, next) {
-    await asyncLocalStorage.run(c, next)
-  }
+    throw new Error("STUB");
 }
 
 export const tryGetContext = <E extends Env = Env>(): Context<E> | undefined => {
@@ -51,9 +49,5 @@ export const tryGetContext = <E extends Env = Env>(): Context<E> | undefined => 
 }
 
 export const getContext = <E extends Env = Env>(): Context<E> => {
-  const context = tryGetContext<E>()
-  if (!context) {
-    throw new Error('Context is not available')
-  }
-  return context
+    throw new Error("STUB");
 }

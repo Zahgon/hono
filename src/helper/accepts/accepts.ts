@@ -19,9 +19,7 @@ export interface acceptsOptions extends acceptsConfig {
 }
 
 export const defaultMatch = (accepts: Accept[], config: acceptsConfig): string => {
-  const { supports, default: defaultSupport } = config
-  const accept = accepts.sort((a, b) => b.q - a.q).find((accept) => supports.includes(accept.type))
-  return accept ? accept.type : defaultSupport
+    throw new Error("STUB");
 }
 
 /**
@@ -38,12 +36,5 @@ export const defaultMatch = (accepts: Accept[], config: acceptsConfig): string =
  * ```
  */
 export const accepts = (c: Context, options: acceptsOptions): string => {
-  const acceptHeader = c.req.header(options.header)
-  if (!acceptHeader) {
-    return options.default
-  }
-  const accepts = parseAccept(acceptHeader)
-  const match = options.match || defaultMatch
-
-  return match(accepts, options)
+    throw new Error("STUB");
 }

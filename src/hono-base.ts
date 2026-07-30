@@ -29,7 +29,7 @@ import { COMPOSED_HANDLER } from './utils/constants'
 import { getPath, getPathNoStrict, mergePath } from './utils/url'
 
 const notFoundHandler: NotFoundHandler = (c) => {
-  return c.text('404 Not Found', 404)
+    throw new Error("STUB");
 }
 
 const errorHandler: ErrorHandler = (err, c) => {
@@ -124,63 +124,11 @@ class Hono<
   routes: RouterRoute[] = []
 
   constructor(options: HonoOptions<E> = {}) {
-    // Implementation of app.get(...handlers[]) or app.get(path, ...handlers[])
-    const allMethods = [...METHODS, METHOD_NAME_ALL_LOWERCASE]
-    allMethods.forEach((method) => {
-      this[method] = (args1: string | H, ...args: H[]) => {
-        if (typeof args1 === 'string') {
-          this.#path = args1
-        } else {
-          this.#addRoute(method, this.#path, args1)
-        }
-        args.forEach((handler) => {
-          this.#addRoute(method, this.#path, handler)
-        })
-        return this as any
-      }
-    })
-
-    // Implementation of app.on(method, path, ...handlers[])
-    this.on = (method: string | string[], path: string | string[], ...handlers: H[]) => {
-      for (const p of [path].flat()) {
-        this.#path = p
-        for (const m of [method].flat()) {
-          handlers.map((handler) => {
-            this.#addRoute(m.toUpperCase(), this.#path, handler)
-          })
-        }
-      }
-      return this as any
-    }
-
-    // Implementation of app.use(...handlers[]) or app.use(path, ...handlers[])
-    this.use = (arg1: string | MiddlewareHandler<any>, ...handlers: MiddlewareHandler<any>[]) => {
-      if (typeof arg1 === 'string') {
-        this.#path = arg1
-      } else {
-        this.#path = '*'
-        handlers.unshift(arg1)
-      }
-      handlers.forEach((handler) => {
-        this.#addRoute(METHOD_NAME_ALL, this.#path, handler)
-      })
-      return this as any
-    }
-
-    const { strict, ...optionsWithoutStrict } = options
-    Object.assign(this, optionsWithoutStrict)
-    this.getPath = (strict ?? true) ? (options.getPath ?? getPath) : getPathNoStrict
+      throw new Error("STUB");
   }
 
   #clone(): Hono<E, S, BasePath, CurrentPath> {
-    const clone = new Hono<E, S, BasePath, CurrentPath>({
-      router: this.router,
-      getPath: this.getPath,
-    })
-    clone.errorHandler = this.errorHandler
-    clone.#notFoundHandler = this.#notFoundHandler
-    clone.routes = this.routes
-    return clone
+      throw new Error("STUB");
   }
 
   #notFoundHandler: NotFoundHandler = notFoundHandler
@@ -215,20 +163,7 @@ class Hono<
     path: SubPath,
     app: Hono<SubEnv, SubSchema, SubBasePath, SubCurrentPath>
   ): Hono<E, MergeSchemaPath<SubSchema, MergePath<BasePath, SubPath>> | S, BasePath, CurrentPath> {
-    const subApp = this.basePath(path)
-    app.routes.map((r) => {
-      let handler
-      if (app.errorHandler === errorHandler) {
-        handler = r.handler
-      } else {
-        handler = async (c: Context, next: Next) =>
-          (await compose([], app.errorHandler)(c, () => r.handler(c, next))).res
-        ;(handler as any)[COMPOSED_HANDLER] = r.handler
-      }
-
-      subApp.#addRoute(r.method, r.path, handler, r.basePath)
-    })
-    return this
+      throw new Error("STUB");
   }
 
   /**
@@ -247,9 +182,7 @@ class Hono<
   basePath<SubPath extends string>(
     path: SubPath
   ): Hono<E, S, MergePath<BasePath, SubPath>, MergePath<BasePath, SubPath>> {
-    const subApp = this.#clone()
-    subApp._basePath = mergePath(this._basePath, path)
-    return subApp
+      throw new Error("STUB");
   }
 
   /**
@@ -330,77 +263,15 @@ class Hono<
     applicationHandler: (request: Request, ...args: any) => Response | Promise<Response>,
     options?: MountOptions
   ): Hono<E, S, BasePath, CurrentPath> {
-    // handle options
-    let replaceRequest: MountReplaceRequest | undefined
-    let optionHandler: MountOptionHandler | undefined
-    if (options) {
-      if (typeof options === 'function') {
-        optionHandler = options
-      } else {
-        optionHandler = options.optionHandler
-        if (options.replaceRequest === false) {
-          replaceRequest = (request) => request
-        } else {
-          replaceRequest = options.replaceRequest
-        }
-      }
-    }
-
-    // prepare handlers for request
-    const getOptions: (c: Context) => unknown[] = optionHandler
-      ? (c) => {
-          const options = optionHandler!(c)
-          return Array.isArray(options) ? options : [options]
-        }
-      : (c) => {
-          let executionContext: ExecutionContext | undefined = undefined
-          try {
-            executionContext = c.executionCtx
-          } catch {} // Do nothing
-          return [c.env, executionContext]
-        }
-    replaceRequest ||= (() => {
-      const mergedPath = mergePath(this._basePath, path)
-      const pathPrefixLength = mergedPath === '/' ? 0 : mergedPath.length
-      return (request) => {
-        const url = new URL(request.url)
-        url.pathname = this.getPath(request).slice(pathPrefixLength) || '/'
-        return new Request(url, request)
-      }
-    })()
-
-    const handler: MiddlewareHandler = async (c, next) => {
-      const res = await applicationHandler(replaceRequest(c.req.raw), ...getOptions(c))
-
-      if (res) {
-        return res
-      }
-
-      await next()
-    }
-    this.#addRoute(METHOD_NAME_ALL, mergePath(path, '*'), handler)
-    return this
+      throw new Error("STUB");
   }
 
   #addRoute(method: string, path: string, handler: H, baseRoutePath?: string): void {
-    method = method.toUpperCase()
-    path = mergePath(this._basePath, path)
-    const r: RouterRoute = {
-      basePath:
-        baseRoutePath !== undefined ? mergePath(this._basePath, baseRoutePath) : this._basePath,
-      path,
-      method,
-      handler,
-    }
-    this.router.add(method, path, [handler, r])
-    this.routes.push(r)
+      throw new Error("STUB");
   }
 
   #handleError(err: unknown, c: Context<E>): Response | Promise<Response> {
-    if (err instanceof Error) {
-      return this.errorHandler(err, c)
-    }
-    throw err
+      throw new Error("STUB");
   }
 
   #dispatch(
@@ -409,60 +280,7 @@ class Hono<
     env: E['Bindings'],
     method: string
   ): Response | Promise<Response> {
-    // Handle HEAD method
-    if (method === 'HEAD') {
-      return (async () =>
-        new Response(null, await this.#dispatch(request, executionCtx, env, 'GET')))()
-    }
-
-    const path = this.getPath(request, { env })
-    const matchResult = this.router.match(method, path)
-
-    const c = new Context(request, {
-      path,
-      matchResult,
-      env,
-      executionCtx,
-      notFoundHandler: this.#notFoundHandler,
-    })
-
-    // Do not `compose` if it has only one handler
-    if (matchResult[0].length === 1) {
-      let res: ReturnType<H>
-      try {
-        res = matchResult[0][0][0][0](c, async () => {
-          c.res = await this.#notFoundHandler(c)
-        })
-      } catch (err) {
-        return this.#handleError(err, c)
-      }
-
-      return res instanceof Promise
-        ? res
-            .then(
-              (resolved: Response | undefined) =>
-                resolved || (c.finalized ? c.res : this.#notFoundHandler(c))
-            )
-            .catch((err: Error) => this.#handleError(err, c))
-        : (res ?? this.#notFoundHandler(c))
-    }
-
-    const composed = compose(matchResult[0], this.errorHandler, this.#notFoundHandler)
-
-    return (async () => {
-      try {
-        const context = await composed(c)
-        if (!context.finalized) {
-          throw new Error(
-            'Context is not finalized. Did you forget to return a Response object or `await next()`?'
-          )
-        }
-
-        return context.res
-      } catch (err) {
-        return this.#handleError(err, c)
-      }
-    })()
+      throw new Error("STUB");
   }
 
   /**
@@ -537,7 +355,7 @@ class Hono<
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     addEventListener('fetch', (event: FetchEventLike): void => {
-      event.respondWith(this.#dispatch(event.request, event, undefined, event.request.method))
+        throw new Error("STUB");
     })
   }
 }

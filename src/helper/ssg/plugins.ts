@@ -11,11 +11,8 @@ import type { SSGPlugin } from './ssg'
 export const defaultPlugin = (): SSGPlugin => {
   return {
     afterResponseHook: (res) => {
-      if (res.status !== 200) {
-        return false
-      }
-      return res
-    },
+          throw new Error("STUB");
+      },
   }
 }
 
@@ -53,20 +50,5 @@ const generateRedirectHtml = (location: string) => {
  * The API might be changed.
  */
 export const redirectPlugin = (): SSGPlugin => {
-  return {
-    afterResponseHook: (res) => {
-      if (REDIRECT_STATUS_CODES.has(res.status)) {
-        const location = res.headers.get('Location')
-        if (!location) {
-          return false
-        }
-        const htmlBody = generateRedirectHtml(location)
-        return new Response(htmlBody, {
-          status: 200,
-          headers: { 'Content-Type': 'text/html; charset=utf-8' },
-        })
-      }
-      return res
-    },
-  }
+    throw new Error("STUB");
 }

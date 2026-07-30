@@ -8,8 +8,4 @@ type Env = {
   }
 }
 
-export const getConnInfo: GetConnInfo = (c: Context<Env>) => ({
-  remote: {
-    address: c.env.event.Records[0].cf.request.clientIp,
-  },
-})
+export const getConnInfo: GetConnInfo = (c: Context<Env>) => { throw new Error("STUB"); }
